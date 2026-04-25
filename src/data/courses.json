@@ -4,6 +4,7 @@
     "dept": "ECON",
     "name": "Introductory Microeconomics",
     "year": 1,
+    "desc": "Principles of choice under scarcity and the role of institutions, especially markets, for the production and distribution of goods and services: what and how much gets produced, how is it produced, and who gets what is produced.",
     "prereqs": [],
     "tags": ["core"]
   },
@@ -12,6 +13,7 @@
     "dept": "ECON",
     "name": "Introductory Macroeconomics",
     "year": 1,
+    "desc": "Measurement of economic activity, economic growth, money and financial systems, international economy and exchange rates, business cycles, unemployment and inflation, and macroeconomic policies.",
     "prereqs": [],
     "tags": ["core"]
   },
@@ -20,6 +22,7 @@
     "dept": "STAT",
     "name": "Introductory Statistics I",
     "year": 1,
+    "desc": "Introduction to probability, including Bayes' law, expectations and distributions. Discrete and continuous random variables, including properties of the normal curve. Collection and visual display of single and multi-dimensional data. Introduction to statistical modelling and estimation. Parametric and simulation-based confidence interval estimation.",
     "prereqs": [],
     "tags": ["core"]
   },
