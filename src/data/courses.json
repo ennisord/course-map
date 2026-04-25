@@ -1,0 +1,146 @@
+[
+  {
+    "id": 201,
+    "dept": "ECON",
+    "name": "Introductory Microeconomics",
+    "year": 1,
+    "prereqs": [],
+    "tags": ["core"]
+  },
+  {
+    "id": 203,
+    "dept": "ECON",
+    "name": "Introductory Macroeconomics",
+    "year": 1,
+    "prereqs": [],
+    "tags": ["core"]
+  },
+  {
+    "id": 249,
+    "dept": "MATH",
+    "name": "Calculus I",
+    "year": 1,
+    "prereqs": [],
+    "tags": ["core"]
+  },
+  {
+    "id": 211,
+    "dept": "MATH",
+    "name": "Linear Methods I",
+    "year": 1,
+    "prereqs": [],
+    "tags": ["honours"]
+  },
+  {
+    "id": 301,
+    "dept": "ECON",
+    "name": "Intermediate Microeconomics",
+    "year": 3,
+    "prereqs": [201, 203],
+    "tags": ["core"]
+  },
+  {
+    "id": 303,
+    "dept": "ECON",
+    "name": "Intermediate Microeconomics",
+    "year": 3,
+    "prereqs": [201, 203],
+    "tags": ["core"]
+  },
+  {
+    "id": 357,
+    "dept": "ECON",
+    "name": "Intermediate Microeconomics",
+    "year": 3,
+    "prereqs": [301],
+    "tags": ["core"]
+  },
+  {
+    "id": 359,
+    "dept": "ECON",
+    "name": "Intermediate Microeconomics",
+    "year": 3,
+    "prereqs": [301, 303],
+    "tags": ["core"]
+  },
+  {
+    "id": 387,
+    "dept": "ECON",
+    "name": "Intermediate Microeconomics",
+    "year": 3,
+    "prereqs": [201, 203],
+    "tags": ["honours"]
+  },
+  {
+    "id": 389,
+    "dept": "ECON",
+    "name": "Intermediate Microeconomics",
+    "year": 3,
+    "prereqs": [387],
+    "tags": ["honours"]
+  },
+  {
+    "id": 329,
+    "dept": "ECON",
+    "name": "Electricity Economics",
+    "year": 3,
+    "prereqs": [201, 203],
+    "tags": []
+  },
+  {
+    "id": 341,
+    "dept": "ECON",
+    "name": "Money & Banking",
+    "year": 3,
+    "prereqs": [201, 203],
+    "tags": []
+  },
+  {
+    "id": 311,
+    "dept": "ECON",
+    "name": "Computational Economics",
+    "year": 3,
+    "prereqs": [201, 203],
+    "tags": []
+  },
+  {
+    "id": 471,
+    "dept": "ECON",
+    "name": "Industrial Organization",
+    "year": 3,
+    "prereqs": [357, 359],
+    "tags": []
+  },
+  {
+    "id": 481,
+    "dept": "ECON",
+    "name": "Behavioural Economics",
+    "year": 3,
+    "prereqs": [357, 359],
+    "tags": []
+  },
+  {
+    "id": 425,
+    "dept": "ECON",
+    "name": "International Trade",
+    "year": 3,
+    "prereqs": [357, 359],
+    "tags": []
+  },
+  {
+    "id": 477,
+    "dept": "ECON",
+    "name": "Regulatory Economics",
+    "year": 3,
+    "prereqs": [471],
+    "tags": []
+  },
+  {
+    "id": 571,
+    "dept": "ECON",
+    "name": "Competition Policy",
+    "year": 3,
+    "prereqs": [471],
+    "tags": []
+  }
+]
