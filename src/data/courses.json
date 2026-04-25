@@ -16,6 +16,22 @@
     "tags": ["core"]
   },
   {
+    "id": 213,
+    "dept": "STAT",
+    "name": "Introductory Statistics I",
+    "year": 1,
+    "prereqs": [],
+    "tags": ["core"]
+  },
+  {
+    "id": 217,
+    "dept": "STAT",
+    "name": "Introductory Statistics I",
+    "year": 1,
+    "prereqs": ["STAT 213"],
+    "tags": ["core"]
+  },
+  {
     "id": 249,
     "dept": "MATH",
     "name": "Calculus I",
@@ -76,7 +92,7 @@
     "dept": "ECON",
     "name": "Intermediate Microeconomics",
     "year": 3,
-    "prereqs": [387],
+    "prereqs": [387, "MATH 211"],
     "tags": ["honours"]
   },
   {

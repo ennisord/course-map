@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, useCallback } from 'react'
 import courses from './data/courses.json'
 
 const ZONE_GAP = 320
@@ -15,6 +15,21 @@ function getGlow(tags) {
   if (tags.includes('honours')) return '0 0 10px 2px rgba(184,134,11,0.7)'
   if (tags.includes('core')) return '0 0 10px 2px rgba(74,222,128,0.7)'
   return '0 0 10px 2px rgba(150,150,150,0.5)'
+}
+
+// Resolve a prereq (int or string like 'STAT 217') to a course key, or null
+function resolvePrereq(prereq, courseList) {
+  if (typeof prereq === 'number') {
+    const match = courseList.find(c => c.id === prereq)
+    return match ? `${match.dept}-${match.id}` : null
+  }
+  // string like 'STAT 217'
+  const parts = prereq.trim().split(/\s+/)
+  if (parts.length < 2) return null
+  const dept = parts[0]
+  const id = parseInt(parts[1])
+  const match = courseList.find(c => c.dept === dept && c.id === id)
+  return match ? `${match.dept}-${match.id}` : null
 }
 
 function buildLayout(courses) {
@@ -38,7 +53,8 @@ function buildLayout(courses) {
     const subcol = {}
     const getSubcol = (course) => {
       if (subcol[course.id] !== undefined) return subcol[course.id]
-      const inZonePrereqs = course.prereqs.filter(pid => idSet.has(pid))
+      // Only consider integer prereqs within this zone for layout
+      const inZonePrereqs = course.prereqs.filter(p => typeof p === 'number' && idSet.has(p))
       if (inZonePrereqs.length === 0) { subcol[course.id] = 0; return 0 }
       const max = Math.max(...inZonePrereqs.map(pid => {
         const prereq = group.find(c => c.id === pid)
@@ -80,6 +96,20 @@ function getBezier(x1, y1, x2, y2) {
   return `M ${x1} ${y1} C ${cx} ${y1}, ${cx} ${y2}, ${x2} ${y2}`
 }
 
+function clampOffset(x, y, scale) {
+  const vw = window.innerWidth
+  const vh = window.innerHeight
+  const pad = 0.85 // how much of a viewport you can drag past the edge
+  const minX = -4000 * scale + vw * pad
+  const maxX = vw * (1 - pad + 1)
+  const minY = -4000 * scale + vh * pad
+  const maxY = vh * (1 - pad + 1)
+  return {
+    x: Math.min(maxX, Math.max(minX, x)),
+    y: Math.min(maxY, Math.max(minY, y)),
+  }
+}
+
 function CourseNode({ course, pos, selected, onDragStart, onClick }) {
   const { border, text, muted } = getColor(course.tags)
   const glow = selected ? getGlow(course.tags) : 'none'
@@ -106,18 +136,13 @@ function CourseNode({ course, pos, selected, onDragStart, onClick }) {
 
 function Legend() {
   return (
-    <div
-      className="fixed bottom-6 left-6 flex flex-col gap-1.5 rounded-lg bg-[#1a1a1a] border border-[#2e2e2e] px-3 py-2.5 pointer-events-none"
-      style={{ fontFamily: "'League Spartan', sans-serif" }}
-    >
-      <div className="flex items-center gap-2">
-        <div className="w-2.5 h-2.5 rounded-sm bg-[#4ade80]" />
-        <span className="text-[12px] font-medium text-[#888]">Core requirement</span>
-      </div>
-      <div className="flex items-center gap-2">
-        <div className="w-2.5 h-2.5 rounded-sm bg-[#ffd700]" />
-        <span className="text-[12px] font-medium text-[#888]">Honours</span>
-      </div>
+    <div className="fixed bottom-6 left-6 flex flex-col gap-1.5 pointer-events-none" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+      <span className="inline-block bg-green-400 text-[#101010] rounded-md px-2.5 py-0.5 text-lg font-semibold w-fit">
+        Core requirement
+      </span>
+      <span className="inline-block bg-[#ffd700] text-[#101010] rounded-md px-2.5 py-0.5 text-lg font-semibold w-fit">
+        Honours requirement
+      </span>
     </div>
   )
 }
@@ -134,16 +159,35 @@ export default function App() {
   const layout = buildLayout(courses)
   const getKey = (course) => `${course.dept}-${course.id}`
 
+  // Spawn: center the first column on screen
+  useEffect(() => {
+    const positions = Object.values(layout)
+    if (positions.length === 0) return
+    const minX = Math.min(...positions.map(p => p.x))
+    const minY = Math.min(...positions.map(p => p.y))
+    const maxY = Math.max(...positions.map(p => p.y))
+    const colCenterY = (minY + maxY) / 2
+    const spawnX = 120 - minX * scale
+    const spawnY = window.innerHeight / 2 - colCenterY * scale
+    setOffset(clampOffset(spawnX, spawnY, scale))
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   const connectedIds = selectedId ? (() => {
     const selected = courses.find(c => getKey(c) === selectedId)
     if (!selected) return new Set()
     const ids = new Set()
-    selected.prereqs.forEach(pid => {
-      const p = courses.find(c => c.id === pid)
-      if (p) ids.add(getKey(p))
+    selected.prereqs.forEach(prereq => {
+      const key = resolvePrereq(prereq, courses)
+      if (key) ids.add(key)
     })
     courses.forEach(c => {
-      if (c.prereqs.includes(selected.id)) ids.add(getKey(c))
+      if (c.prereqs.some(p => {
+        if (typeof p === 'number') {
+          const sel = courses.find(x => getKey(x) === selectedId)
+          return sel && p === sel.id
+        }
+        return resolvePrereq(p, courses) === selectedId
+      })) ids.add(getKey(c))
     })
     return ids
   })() : new Set()
@@ -159,10 +203,11 @@ export default function App() {
     setScale(prev => {
       const next = Math.min(2, Math.max(0.3, prev + delta))
       const ratio = next / prev
-      setOffset(o => ({
-        x: clientX - ratio * (clientX - o.x),
-        y: clientY - ratio * (clientY - o.y),
-      }))
+      setOffset(o => {
+        const nx = clientX - ratio * (clientX - o.x)
+        const ny = clientY - ratio * (clientY - o.y)
+        return clampOffset(nx, ny, next)
+      })
       return next
     })
   }
@@ -171,7 +216,9 @@ export default function App() {
     const onMouseMove = (e) => {
       if (!dragging) return
       didDragRef.current = true
-      setOffset({ x: e.clientX - startRef.current.x, y: e.clientY - startRef.current.y })
+      const nx = e.clientX - startRef.current.x
+      const ny = e.clientY - startRef.current.y
+      setOffset(clampOffset(nx, ny, scale))
     }
     const onMouseUp = () => setDragging(false)
     window.addEventListener('mousemove', onMouseMove)
@@ -180,7 +227,7 @@ export default function App() {
       window.removeEventListener('mousemove', onMouseMove)
       window.removeEventListener('mouseup', onMouseUp)
     }
-  }, [dragging])
+  }, [dragging, scale])
 
   const beginDrag = (clientX, clientY) => {
     setDragging(true)
@@ -188,9 +235,7 @@ export default function App() {
     startRef.current = { x: clientX - offset.x, y: clientY - offset.y }
   }
 
-  const onMouseDown = (e) => {
-    beginDrag(e.clientX, e.clientY)
-  }
+  const onMouseDown = (e) => beginDrag(e.clientX, e.clientY)
 
   const onWheel = (e) => {
     e.preventDefault()
@@ -218,7 +263,9 @@ export default function App() {
     if (e.touches.length === 1 && dragging) {
       const t = e.touches[0]
       didDragRef.current = true
-      setOffset({ x: t.clientX - startRef.current.x, y: t.clientY - startRef.current.y })
+      const nx = t.clientX - startRef.current.x
+      const ny = t.clientY - startRef.current.y
+      setOffset(clampOffset(nx, ny, scale))
     } else if (e.touches.length === 2 && lastPinchRef.current) {
       const dx = e.touches[0].clientX - e.touches[1].clientX
       const dy = e.touches[0].clientY - e.touches[1].clientY
@@ -257,16 +304,16 @@ export default function App() {
           {courses.map(course => {
             const key = getKey(course)
             const from = layout[key]
-            return course.prereqs.map(prereqId => {
-              const prereq = courses.find(c => c.id === prereqId)
-              if (!prereq) return null
-              const to = layout[getKey(prereq)]
+            return course.prereqs.map((prereq, i) => {
+              const prereqKey = resolvePrereq(prereq, courses)
+              if (!prereqKey) return null
+              const to = layout[prereqKey]
               if (!from || !to) return null
-              const isHighlighted = selectedId === key || selectedId === getKey(prereq)
+              const isHighlighted = selectedId === key || selectedId === prereqKey
               const { border } = getColor(course.tags)
               return (
                 <path
-                  key={`${key}-${prereqId}`}
+                  key={`${key}-${i}`}
                   d={getBezier(to.x, to.y, from.x, from.y)}
                   stroke={border}
                   strokeWidth={isHighlighted ? 2 : 1.5}
@@ -294,9 +341,7 @@ export default function App() {
                 beginDrag(clientX, clientY)
               }}
               onClick={() => {
-                if (!didDragRef.current) {
-                  setSelectedId(prev => prev === key ? null : key)
-                }
+                if (!didDragRef.current) setSelectedId(prev => prev === key ? null : key)
               }}
             />
           )
