@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from 'react'
 import courses from './data/courses.json'
 
+const COL_GAP = 280
 const ZONE_GAP = 320
 const SUBCOL_GAP = 220
 const ROW_GAP = 100
@@ -85,6 +86,7 @@ function CourseNode({ course, pos, selected, onClick }) {
       className="absolute select-none w-44 rounded-lg bg-[#1a1a1a] px-3 py-2 -translate-x-1/2 -translate-y-1/2 cursor-pointer"
       style={{ left: pos.x, top: pos.y, border: `1px solid ${border}`, fontFamily: "'League Spartan', sans-serif" }}
       onMouseDown={e => e.stopPropagation()}
+      onTouchStart={e => e.stopPropagation()}
       onClick={onClick}
     >
       <div className="text-[13px] font-bold tracking-wide truncate" style={{ color: text }}>{course.dept} {course.id}</div>
@@ -117,9 +119,9 @@ export default function App() {
   const [dragging, setDragging] = useState(false)
   const [selectedId, setSelectedId] = useState(null)
   const startRef = useRef({ x: 0, y: 0 })
+  const lastPinchRef = useRef(null)
 
   const layout = buildLayout(courses)
-
   const getKey = (course) => `${course.dept}-${course.id}`
 
   const connectedIds = selectedId ? (() => {
@@ -168,12 +170,48 @@ export default function App() {
     setScale(s => Math.min(2, Math.max(0.3, s - e.deltaY * 0.001)))
   }
 
+  const onTouchStart = (e) => {
+    if (e.touches.length === 1) {
+      const t = e.touches[0]
+      setDragging(true)
+      startRef.current = { x: t.clientX - offset.x, y: t.clientY - offset.y }
+    } else if (e.touches.length === 2) {
+      setDragging(false)
+      const dx = e.touches[0].clientX - e.touches[1].clientX
+      const dy = e.touches[0].clientY - e.touches[1].clientY
+      lastPinchRef.current = Math.hypot(dx, dy)
+    }
+  }
+
+  const onTouchMove = (e) => {
+    e.preventDefault()
+    if (e.touches.length === 1 && dragging) {
+      const t = e.touches[0]
+      setOffset({ x: t.clientX - startRef.current.x, y: t.clientY - startRef.current.y })
+    } else if (e.touches.length === 2 && lastPinchRef.current) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX
+      const dy = e.touches[0].clientY - e.touches[1].clientY
+      const dist = Math.hypot(dx, dy)
+      const delta = dist - lastPinchRef.current
+      lastPinchRef.current = dist
+      setScale(s => Math.min(2, Math.max(0.3, s + delta * 0.005)))
+    }
+  }
+
+  const onTouchEnd = () => {
+    setDragging(false)
+    lastPinchRef.current = null
+  }
+
   return (
     <div
       onMouseDown={onMouseDown}
       onWheel={onWheel}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
       className={`w-screen h-screen overflow-hidden relative select-none ${dragging ? 'cursor-grabbing' : 'cursor-grab'}`}
-      style={{ background: '#101010' }}
+      style={{ background: '#101010', touchAction: 'none' }}
     >
       <div style={{
         transform: `translate(${offset.x}px, ${offset.y}px) scale(${scale})`,
