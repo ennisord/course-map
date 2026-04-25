@@ -52,7 +52,7 @@
     "dept": "ECON",
     "name": "Intermediate Microeconomics",
     "year": 3,
-    "prereqs": [201, 203],
+    "prereqs": [201, 203, "MATH 249"],
     "tags": ["core"]
   },
   {
@@ -60,7 +60,7 @@
     "dept": "ECON",
     "name": "Intermediate Microeconomics",
     "year": 3,
-    "prereqs": [201, 203],
+    "prereqs": [201, 203, "MATH 249"],
     "tags": ["core"]
   },
   {
