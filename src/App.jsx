@@ -1,9 +1,11 @@
 import { useRef, useState, useEffect, useCallback } from 'react'
 import courses from './data/courses.json'
+import LoadingScreen from './components/LoadingScreen'
 
 const ZONE_GAP = 320
 const SUBCOL_GAP = 220
 const ROW_GAP = 100
+const WORD = 'Course Map'
 
 function getColor(tags) {
   if (tags.includes('honours')) return { border: '#b8860b', text: '#ffd700', muted: '#8a6500' }
@@ -186,10 +188,10 @@ function CourseNode({ course, pos, selected, onDragStart, onClick }) {
 function Legend() {
   return (
     <div className="fixed bottom-6 left-6 flex flex-col gap-1.5 pointer-events-none" style={{ fontFamily: "'League Spartan', sans-serif" }}>
-      <span className="inline-block bg-green-400 text-[#101010] rounded-md px-2.5 py-0.5 text-lg font-semibold w-fit">
+      <span className="inline-block bg-green-400 text-[#101010] rounded-md px-2.5 py-0.5 text-md font-medium w-fit">
         Core requirement
       </span>
-      <span className="inline-block bg-[#ffd700] text-[#101010] rounded-md px-2.5 py-0.5 text-lg font-semibold w-fit">
+      <span className="inline-block bg-[#ffd700] text-[#101010] rounded-md px-2.5 py-0.5 text-md font-medium w-fit">
         Honours requirement
       </span>
     </div>
@@ -207,6 +209,14 @@ export default function App() {
 
   const layout = buildLayout(courses)
   const getKey = (course) => `${course.dept}-${course.id}`
+
+  // Loading screen
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const t = setTimeout(() => setLoading(false), WORD.length * 120 + 600)
+    return () => clearTimeout(t)
+  }, [])
 
   // Spawn: center the first column on screen
   useEffect(() => {
@@ -331,6 +341,8 @@ export default function App() {
     setDragging(false)
     lastPinchRef.current = null
   }
+
+  if (loading) return <LoadingScreen />
 
   return (
     <div
