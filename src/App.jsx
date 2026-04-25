@@ -4,6 +4,7 @@ import { buildLayout, getBezier, getColor, resolvePrereq, clampOffset } from './
 import CourseNode from './components/CourseNode'
 import Legend from './components/Legend'
 import LoadingScreen from './components/LoadingScreen'
+import CourseDetailPanel from './components/CourseDetailPanel'
 
 const WORD = 'Course Map'
 
@@ -19,6 +20,11 @@ export default function App() {
 
   const layout = buildLayout(courses)
   const getKey = (course) => `${course.dept}-${course.id}`
+
+  // The course object for the currently selected node (or null)
+  const selectedCourse = selectedId
+    ? courses.find(c => getKey(c) === selectedId) ?? null
+    : null
 
   useEffect(() => {
     const t = setTimeout(() => setLoading(false), WORD.length * 120 + 600)
@@ -200,6 +206,13 @@ export default function App() {
           )
         })}
       </div>
+
+      {/* Course detail panel — sits outside the panning layer so it stays fixed */}
+      <CourseDetailPanel
+        course={selectedCourse}
+        courses={courses}
+        onClose={() => setSelectedId(null)}
+      />
 
       <Legend />
     </div>
