@@ -1,48 +1,14 @@
 [
   {
-    "id": 295,
-    "dept": "",
-    "name": "Introduction to Coding and Data",
-    "year": 1,
-    "desc": "Introduction to the logic and practice of coding and the core elements of statistical analysis of data as they apply in economics and the social sciences more broadly.\n\nPrerequisite(s): Statistics 213.",
-    "prereqs": [],
-    "tags": []
-  },
-  {
-    "id": 343,
-    "dept": "",
-    "name": "Intro to Financial Economics",
-    "year": 3,
-    "desc": "Introduces students to accounting statements, asset pricing and the valuation of risky cash flows to develop tools for the quantitative analysis of financing and capital budgeting decisions\n\nPrerequisite(s): 6 units of Economics 201 and 203, and 3 units from Economics 311 or Management Studies 217.\n\nAntirequisite(s): Credit for Economics 343 and any of Finance 317, 341 or 343 will not be allowed.\n\nAlso known as: (formerly Economics 457)",
-    "prereqs": [],
-    "tags": []
-  },
-  {
-    "id": 393,
-    "dept": "",
-    "name": "Entertainment Markets",
-    "year": 3,
-    "desc": "Economics of the creative industries, including filmed entertainment, music, publishing, games, wagering, and live performances.\n\nPrerequisite(s): Economics 201 and 203.\n\nAlso known as: (formerly Economics 499.73 (Entertainment Industry Economics) )",
-    "prereqs": [],
-    "tags": []
-  },
-  {
-    "id": 399,
-    "dept": "",
-    "name": "Introductory Topics in Economics",
-    "year": 3,
-    "desc": "Examination of a particular topic. Examples include the economics of sports, the economics of the wine industry, and the economics of popular music.\n\nPrerequisite(s): Economics 201 and 203.\n\nMAY BE REPEATED FOR CREDIT",
-    "prereqs": [],
-    "tags": []
-  },
-  {
     "id": 201,
     "dept": "ECON",
     "name": "Principles of Microeconomics",
     "year": 1,
     "desc": "Principles of choice under scarcity and the role of institutions, especially markets, for the production and distribution of goods and services: what and how much gets produced, how is it produced, and who gets what is produced.",
     "prereqs": [],
-    "tags": []
+    "tags": [
+      "core"
+    ]
   },
   {
     "id": 203,
@@ -51,7 +17,9 @@
     "year": 1,
     "desc": "Measurement of economic activity, economic growth, money and financial systems, international economy and exchange rates, business cycles, unemployment and inflation, and macroeconomic policies.\n\nCorequisite(s): Prerequisite or Corequisite: Economics 201.",
     "prereqs": [],
-    "tags": []
+    "tags": [
+      "core"
+    ]
   },
   {
     "id": 209,
@@ -63,210 +31,339 @@
     "tags": []
   },
   {
+    "id": 295,
+    "dept": "ECON",
+    "name": "Introduction to Coding and Data",
+    "year": 1,
+    "desc": "Introduction to the logic and practice of coding and the core elements of statistical analysis of data as they apply in economics and the social sciences more broadly.\n\nPrerequisite(s): Statistics 213.",
+    "prereqs": [
+      "STAT 213"
+    ],
+    "tags": []
+  },
+  {
     "id": 301,
     "dept": "ECON",
     "name": "Intermediate Economic Theory - Microeconomics I",
-    "year": 3,
+    "year": 2,
     "desc": "Economic methodology, consumer theory, theory of the firm, competitive markets, efficiency, and the role of economics in public policy.\n\nPrerequisite(s): Economics 201, 203 and 3 units from Mathematics 249, 265 or 275.",
-    "prereqs": [],
-    "tags": []
+    "prereqs": [
+      201,
+      203,
+      "MATH 249",
+      "MATH 265",
+      "MATH 275"
+    ],
+    "tags": [
+      "core"
+    ]
   },
   {
     "id": 303,
     "dept": "ECON",
     "name": "Intermediate Economic Theory - Macroeconomics I",
-    "year": 3,
+    "year": 2,
     "desc": "Theories of long-run economic performance and Keynesian economic models for the analysis of short-run economic fluctuations, the role of expectations, and stabilization policies.\n\nPrerequisite(s): Economics 201, 203 and 3 units from Mathematics 249, 265 or 275.",
-    "prereqs": [],
-    "tags": []
+    "prereqs": [
+      201,
+      203,
+      "MATH 249",
+      "MATH 265",
+      "MATH 275"
+    ],
+    "tags": [
+      "core"
+    ]
   },
   {
     "id": 311,
     "dept": "ECON",
     "name": "Computer Applications in Economics",
-    "year": 3,
+    "year": 2,
     "desc": "Use of spreadsheets for economics applications, including project evaluation with financial-economic functions, oil and gas prospect evaluation, investment portfolio management with database functions, database retrieval, and various topics in micro and macroeconomics.\n\nPrerequisite(s): Economics 201.\n\nAntirequisite(s): Credit for Economics 311 and Management Studies 217 will not be allowed.",
-    "prereqs": [],
+    "prereqs": [
+      201
+    ],
     "tags": []
   },
   {
     "id": 321,
     "dept": "ECON",
     "name": "The Global Trading System",
-    "year": 3,
+    "year": 2,
     "desc": "Introduction to the theory of international trade; provides a basis for examining Canadian trade policy, and regional and world trade institutions such as the WTO and NAFTA. Topics include: tariffs, non-tariff barriers and enhancements, countervail and anti-dumping action, multinational enterprises and international joint ventures.\t\n\nPrerequisite(s): Economics 201.",
-    "prereqs": [],
+    "prereqs": [
+      201
+    ],
     "tags": []
   },
   {
     "id": 323,
     "dept": "ECON",
     "name": "Natural Gas Markets",
-    "year": 3,
+    "year": 2,
     "desc": "Operation of the natural gas industry in North America. Economics of exploration, development, production, marketing and transportation of natural gas. Impact of government regulations and deregulation.\n\nPrerequisite(s): Economics 201.",
-    "prereqs": [],
+    "prereqs": [
+      201
+    ],
     "tags": []
   },
   {
     "id": 328,
     "dept": "ECON",
     "name": "Petroleum Economics",
-    "year": 3,
+    "year": 2,
     "desc": "Crude oil production and markets in North America and globally. Refining economics and markets for refined products. Government policy including royalty regimes, trade quotas, transport infrastructure, conservation and the environment.\n\nPrerequisite(s): Economics 201.\n\nAntirequisite(s): Credit for Economics 328 and 325 or 327 will not be allowed.",
-    "prereqs": [],
+    "prereqs": [
+      201
+    ],
     "tags": []
   },
   {
     "id": 329,
     "dept": "ECON",
     "name": "Electricity Markets",
-    "year": 3,
+    "year": 2,
     "desc": "Economic analysis of the deregulated electric power industry including the pricing of power, energy and capacity, power supply and demand, market structure, market architecture, and the design and testing of market rules.\n\nPrerequisite(s): Economics 201.",
-    "prereqs": [],
+    "prereqs": [
+      201
+    ],
     "tags": []
   },
   {
     "id": 337,
     "dept": "ECON",
     "name": "Development Economics",
-    "year": 3,
+    "year": 2,
     "desc": "An introduction to developing economies: the meaning, significance and purpose of economic development, major theories of economic development, economic problems of developing countries.\t\n\nPrerequisite(s): Economics 201 and 203 or consent of the Department.",
-    "prereqs": [],
+    "prereqs": [
+      201,
+      203
+    ],
     "tags": []
   },
   {
     "id": 339,
     "dept": "ECON",
     "name": "Canadian Economic History",
-    "year": 3,
+    "year": 2,
     "desc": "The growth and development of the Canadian economy in relation to the endowment of natural resources, changing market conditions and technology, and Canadian public policy.\t\n\nPrerequisite(s): Economics 201 and 203 or consent of the Department.",
-    "prereqs": [],
+    "prereqs": [
+      201,
+      203
+    ],
     "tags": []
   },
   {
     "id": 341,
     "dept": "ECON",
     "name": "Money and Banking",
-    "year": 3,
+    "year": 2,
     "desc": "Operation of financial markets and institutions: the principles of money creation, interest rate determination, and central banking.\t\n\nPrerequisite(s): Economics 201 and 203.",
-    "prereqs": [],
+    "prereqs": [
+      201,
+      203
+    ],
+    "tags": []
+  },
+  {
+    "id": 343,
+    "dept": "ECON",
+    "name": "Intro to Financial Economics",
+    "year": 2,
+    "desc": "Introduces students to accounting statements, asset pricing and the valuation of risky cash flows to develop tools for the quantitative analysis of financing and capital budgeting decisions\n\nPrerequisite(s): 6 units of Economics 201 and 203, and 3 units from Economics 311 or Management Studies 217.\n\nAntirequisite(s): Credit for Economics 343 and any of Finance 317, 341 or 343 will not be allowed.\n\nAlso known as: (formerly Economics 457)",
+    "prereqs": [
+      311
+    ],
     "tags": []
   },
   {
     "id": 345,
     "dept": "ECON",
     "name": "Economic Analysis Of Law I",
-    "year": 3,
+    "year": 2,
     "desc": "An introduction to the relationship between law and economics. Economic theory will be used to analyse property and tort law.\n\nPrerequisite(s): Economics 201 or consent of the Department.",
-    "prereqs": [],
+    "prereqs": [
+      201
+    ],
     "tags": []
   },
   {
     "id": 349,
     "dept": "ECON",
     "name": "The Economics of Social Issues",
-    "year": 3,
+    "year": 2,
     "desc": "Contribution that economic analysis can make to the understanding of selected current social issues such as poverty, aging, crime, drug abuse and discrimination.\n\nPrerequisite(s): Economics 201.",
-    "prereqs": [],
+    "prereqs": [
+      201
+    ],
     "tags": []
   },
   {
     "id": 353,
     "dept": "ECON",
     "name": "Chinese Economy",
-    "year": 3,
+    "year": 2,
     "desc": "Survey of the economic institutions and processes shaping the Chinese economy, including but not limited to fiscal and monetary policy, financial institutions and financial sector reforms, the restructuring of state-owned enterprises, and the provision of social welfare.\n\nPrerequisite(s): Economics 201 and 203.\n\nAntirequisite(s): Credit for Economics 353 and Economics 399.02 will not be allowed.",
-    "prereqs": [],
+    "prereqs": [
+      201,
+      203
+    ],
     "tags": []
   },
   {
     "id": 355,
     "dept": "ECON",
     "name": "Canadian Public Finance",
-    "year": 3,
+    "year": 2,
     "desc": "Examination of the institutions behind and economic rationale for Canadian government policy relating to public expenditures and taxation. Topics include the history and present structure of government spending and taxation, tax expenditures, the budgetary process, inter-jurisdictional issues, and program design.\t  \n\nPrerequisite(s): Economics 201.",
-    "prereqs": [],
+    "prereqs": [
+      201
+    ],
     "tags": []
   },
   {
     "id": 357,
     "dept": "ECON",
     "name": "Intermediate Economic Theory - Microeconomics II",
-    "year": 3,
+    "year": 2,
     "desc": "Intertemporal choice and choice under uncertainty. General equilibrium and the welfare theorems. Public and social choice theory. Market failures: imperfect competition, externalities, public goods, and informational asymmetries.\n\nPrerequisite(s): Economics 301.\n\nAntirequisite(s): Credit for Economics 357 and either 309 or 529 will not be allowed.",
-    "prereqs": [],
-    "tags": []
+    "prereqs": [
+      301
+    ],
+    "tags": [
+      "core"
+    ]
   },
   {
     "id": 359,
     "dept": "ECON",
     "name": "Intermediate Economic Theory-Macroecononics II",
-    "year": 3,
+    "year": 2,
     "desc": "Modern intertemporal macroeconomics based on microeconomic foundations. Analysis of market interaction through optimal choices and market clearing within and across time, economic fluctuations, market imperfections, and role of government policies.  \n\nPrerequisite(s): Economics 301 and 303.  \n\nAntirequisite(s): Credit for Economics 359 and either 313 or 531 will not be allowed.",
-    "prereqs": [],
-    "tags": []
+    "prereqs": [
+      301,
+      303
+    ],
+    "tags": [
+      "core"
+    ]
   },
   {
     "id": 371,
     "dept": "ECON",
     "name": "Economic Analysis of Transportation",
-    "year": 3,
+    "year": 2,
     "desc": "Modal choice by passengers, location choice by firms, capital investment choice. Cost, demand, and market structure related to the determination of transportation rates. Cost/benefit analysis of transportation projects. Analysis will be related to contemporary aspects of ocean shipping, air, rail, trucking, pipelines and urban transportation.\n\nPrerequisite(s): Economics 201.",
-    "prereqs": [],
+    "prereqs": [
+      201
+    ],
     "tags": []
   },
   {
     "id": 373,
     "dept": "ECON",
     "name": "Game Theory and Strategic Thinking for the Social Sciences",
-    "year": 3,
+    "year": 2,
     "desc": "Principles of game theory utilizing a non-mathematical and intuitive approach. Strategic reasoning and the use of game theory to explain social interaction. Game theory analysis is illustrated using applications and examples from economics and other social sciences.\n\nPrerequisite(s): Economics 201.",
-    "prereqs": [],
+    "prereqs": [
+      201
+    ],
     "tags": []
   },
   {
     "id": 377,
     "dept": "ECON",
     "name": "Economics and the Environment",
-    "year": 3,
+    "year": 2,
     "desc": "Analysis of environmental problems from an economic perspective. Efficient allocation of resources and its implications for air and water quality, waste management, biodiversity and endangered species will be addressed from local as well as global perspectives.\n\nPrerequisite(s): Economics 201.",
-    "prereqs": [],
+    "prereqs": [
+      201
+    ],
     "tags": []
   },
   {
     "id": 379,
     "dept": "ECON",
     "name": "The Economics of Health",
-    "year": 3,
+    "year": 2,
     "desc": "Theories and evidence regarding demand for health and health care, consumer and physician behaviour, asymmetric information in health care markets, and economic evaluation of health care programs.\n\nPrerequisite(s): Economics 201.",
-    "prereqs": [],
+    "prereqs": [
+      201
+    ],
     "tags": []
   },
   {
     "id": 387,
     "dept": "ECON",
     "name": "Introduction to Mathematical Economics I",
-    "year": 3,
+    "year": 2,
     "desc": "Mathematics for economics with an emphasis on economic modeling and equilibrium analysis. Multivariate calculus including comparative statics, unconstrained and constrained optimization, and their applications to resource allocation problems.\n\nPrerequisite(s): Economics 201, 203 and 3 units from Mathematics 249, 265 or 275.\n\nCorequisite(s): Prerequisites or Corequisites: Economics 301 and 303.\n\nAntirequisite(s): Credit for Economics 387 and either 304 or 521 will not be allowed.",
-    "prereqs": [],
-    "tags": []
+    "prereqs": [
+      201,
+      203,
+      "MATH 249",
+      "MATH 265",
+      "MATH 275"
+    ],
+    "tags": [
+      "honours"
+    ]
   },
   {
     "id": 389,
     "dept": "ECON",
     "name": "Introduction to Mathematical Economics II",
-    "year": 3,
+    "year": 2,
     "desc": "Application of linear algebra to economic analysis and optimization. Integration and differential equations and their application in economic analysis.\n\nPrerequisite(s): Economics 387 and Mathematics 211.\n\nAntirequisite(s): Credit for Economics 389 and 304 will not be allowed.",
-    "prereqs": [],
+    "prereqs": [
+      387,
+      "MATH 211"
+    ],
+    "tags": [
+      "honours"
+    ]
+  },
+  {
+    "id": 393,
+    "dept": "ECON",
+    "name": "Entertainment Markets",
+    "year": 2,
+    "desc": "Economics of the creative industries, including filmed entertainment, music, publishing, games, wagering, and live performances.\n\nPrerequisite(s): Economics 201 and 203.\n\nAlso known as: (formerly Economics 499.73 (Entertainment Industry Economics) )",
+    "prereqs": [
+      201,
+      203
+    ],
     "tags": []
   },
   {
     "id": 395,
     "dept": "ECON",
     "name": "Introduction to Econometrics",
-    "year": 3,
+    "year": 2,
     "desc": "Two-variable and multi-variable linear regression models are introduced, developed and evaluated. Topics include basic data manipulation, econometric estimation of economic relationships, model specification and evaluation, hypothesis testing, and binary variables.  \n\nPrerequisite(s): Economics 201, 203; and One of: 6 units Statistics 213 and 217; or 6 units from Statistics 213 and Economics 295;  or 9 units from Statistics 207 and Data Science 305 with 3 units from Data Science 211 or Computer Science 217 or Computer Science 231.",
-    "prereqs": [],
+    "prereqs": [
+      201,
+      203,
+      217,
+      "STAT 213",
+      295,
+      "STAT 207"
+    ],
+    "tags": [
+      "core"
+    ]
+  },
+  {
+    "id": 399,
+    "dept": "ECON",
+    "name": "Introductory Topics in Economics",
+    "year": 2,
+    "desc": "Examination of a particular topic. Examples include the economics of sports, the economics of the wine industry, and the economics of popular music.\n\nPrerequisite(s): Economics 201 and 203.\n\nMAY BE REPEATED FOR CREDIT",
+    "prereqs": [
+      201,
+      203
+    ],
     "tags": []
   },
   {
@@ -275,7 +372,9 @@
     "name": "Public Sector Economics: Expenditures",
     "year": 3,
     "desc": "Theory of government spending. May include the nature of public goods and externalities, the pricing of public services, causes of growth of public expenditures, expenditure incidence, social insurance, social decision procedures, and political and bureaucratic influences. \n\n Prerequisite(s): Economics 357.",
-    "prereqs": [],
+    "prereqs": [
+      357
+    ],
     "tags": []
   },
   {
@@ -284,7 +383,9 @@
     "name": "Public Sector Economics: Taxation",
     "year": 3,
     "desc": "Theory of taxation. May include the rationale for and the incentive effects of taxation, efficiency and equity aspects of taxation, partial and general equilibrium tax incidence, open economy effects, choice of governing instruments, and tax reform.  \n\nPrerequisite(s): Economics 357.",
-    "prereqs": [],
+    "prereqs": [
+      357
+    ],
     "tags": []
   },
   {
@@ -293,7 +394,10 @@
     "name": "Political Economy of Public Policy",
     "year": 3,
     "desc": "Introduction to the economic foundations of political economy and economic models of public sector policy formation. May include the role of institutions in policy design, theories of bureaucracy, political business cycles, the formation and behaviour of interest groups, and the strategic use of government debt.  \n\nPrerequisite(s): Economics 357 and 395.",
-    "prereqs": [],
+    "prereqs": [
+      357,
+      395
+    ],
     "tags": []
   },
   {
@@ -302,7 +406,11 @@
     "name": "Computational and Data Methods in Economics",
     "year": 3,
     "desc": "Economic application and utilization of computational methods, programming, and data management. Introduction and use of programming in economic analysis, examples include VBA, R, Python, Mathematica, and MATLAB.\n\nPrerequisite(s): 3 units from Economics 311 or Management Studies 217 and 9 units in Economics 357, 359 and 395.",
-    "prereqs": [],
+    "prereqs": [
+      311,
+      359,
+      395
+    ],
     "tags": []
   },
   {
@@ -311,7 +419,10 @@
     "name": "International Macroeconomics",
     "year": 3,
     "desc": "Foreign exchange markets, and international macroeconomic connections with trade in assets as well as goods and services. May include: alternative exchange rate regimes; monetary and fiscal policy responses to problems of unemployment and inflation; balance of payments adjustment mechanisms; international debt; and Euro-dollar markets.\n\nPrerequisite(s): Economics 357 and 359.",
-    "prereqs": [],
+    "prereqs": [
+      357,
+      359
+    ],
     "tags": []
   },
   {
@@ -320,7 +431,11 @@
     "name": "International Trade",
     "year": 3,
     "desc": "The general equilibrium treatment of the gains from trade, comparative advantage and trade patterns provides a basis for examining topics such as: trade policy under imperfect competition, trade policy and the environment, trade policy and economic growth, and preferential trading arrangements.  \n\nPrerequisite(s): Economics 303, 357 and 395.",
-    "prereqs": [],
+    "prereqs": [
+      303,
+      357,
+      395
+    ],
     "tags": []
   },
   {
@@ -329,7 +444,9 @@
     "name": "Energy Economics and Policy",
     "year": 3,
     "desc": "Microeconomic analysis of the allocation of energy resources with a focus on policy issues including the environment, OPEC, national security, price and entry regulation, market design, and the potential for new energy sources.  \n\nPrerequisite(s): Economics 357.",
-    "prereqs": [],
+    "prereqs": [
+      357
+    ],
     "tags": []
   },
   {
@@ -338,7 +455,10 @@
     "name": "Advanced Electricity Markets",
     "year": 3,
     "desc": "Market design of electricity markets; transmission regulation, investment and pricing; ancillary service demand, procurement, and regulation; retail competition; and distribution and distributed generation.  \n\nPrerequisite(s): Economics 329 and 357.",
-    "prereqs": [],
+    "prereqs": [
+      329,
+      357
+    ],
     "tags": []
   },
   {
@@ -347,7 +467,10 @@
     "name": "Labour Economics",
     "year": 3,
     "desc": "Economic analysis of migration, labour force participation, education, fertility, human resources policy, and the measurement and treatment of unemployment.  \n\nPrerequisite(s): Economics 357 and 395.",
-    "prereqs": [],
+    "prereqs": [
+      357,
+      395
+    ],
     "tags": []
   },
   {
@@ -356,7 +479,14 @@
     "name": "The Economics of Financial Markets",
     "year": 3,
     "desc": "Basic functions and structure of financial markets. Economic analysis of trading strategies in financial markets and determinants of equilibrium prices. Institutional features, and analysis, of bond, stock, options, forward and futures markets.  \n\nPrerequisite(s): 3 units from Economics 311, Management Studies 217; 6 units from Economics 303, 357; and 3 units from Economics 343, 457, Finance 317, 341, 343.",
-    "prereqs": [],
+    "prereqs": [
+      311,
+      303,
+      357,
+      343,
+      457,
+      341
+    ],
     "tags": []
   },
   {
@@ -365,7 +495,14 @@
     "name": "Cost-Benefit Analysis",
     "year": 3,
     "desc": "Theoretical basis for social cost-benefit analysis, appraisal techniques for investment projects and public policies, and selected applications.  \n\nPrerequisite(s): Economics 303 and 357; 3 units from Economics 311, Management Studies 217; 3 units from Economics 343, 457, Finance 317, 341, 343.",
-    "prereqs": [],
+    "prereqs": [
+      303,
+      357,
+      311,
+      343,
+      457,
+      341
+    ],
     "tags": []
   },
   {
@@ -374,7 +511,9 @@
     "name": "Industrial Organization",
     "year": 3,
     "desc": "Behaviour of firms in imperfectly competitive markets. May include the theory of strategic competition; dynamic price competition and tacit collusion; product differentiation, product selection, and preemption; entry deterrence and capacity competition; information, reputation, and predation; the economics of research and development; international trade and imperfectly competitive markets.  \n\nPrerequisite(s): Economics 357.",
-    "prereqs": [],
+    "prereqs": [
+      357
+    ],
     "tags": []
   },
   {
@@ -383,7 +522,9 @@
     "name": "Economics of Natural Resources",
     "year": 3,
     "desc": "Application of economic theory to the problems of natural resource pricing, allocation and conservation. Rent theory, location theory, intertemporal maximization. Natural resource policy formulation. Contemporary Canadian resource problems.  \n\nPrerequisite(s): Economics 357.",
-    "prereqs": [],
+    "prereqs": [
+      357
+    ],
     "tags": []
   },
   {
@@ -392,7 +533,10 @@
     "name": "Regulatory Economics",
     "year": 3,
     "desc": "An introduction to economic regulation, its rationale, form and effects with a focus on the economic theory of regulation and on the practice, structure, and evolution of Canadian regulatory institutions.  \n\nPrerequisite(s): Economics 395 and 471.",
-    "prereqs": [],
+    "prereqs": [
+      395,
+      471
+    ],
     "tags": []
   },
   {
@@ -401,7 +545,10 @@
     "name": "Experimental Economics",
     "year": 3,
     "desc": "Introduces students to the use of and insights gained from experiments in economic research. As part of the course, students will be participating in a variety of in-class experiments.  \n\nPrerequisite(s): Economics 357 and 395.",
-    "prereqs": [],
+    "prereqs": [
+      357,
+      395
+    ],
     "tags": []
   },
   {
@@ -410,7 +557,10 @@
     "name": "Behavioural Economics",
     "year": 3,
     "desc": "Major factors underlying economic behaviour including: various views of the role of rationality in economic analysis and in the economic decision making of individuals and institutions; determinants of individual preferences and decision making procedures; the experimental analysis of economic behaviour; inter-relations between the operation of the economic system and feelings of subjective well-being.\n\nPrerequisite(s): Economics 357 and 359.",
-    "prereqs": [],
+    "prereqs": [
+      357,
+      359
+    ],
     "tags": []
   },
   {
@@ -419,7 +569,10 @@
     "name": "History of Economic Thought",
     "year": 3,
     "desc": "Traces the evolution of economic ideas from the earliest times up to and including the contributions of the classical economists and Marx. Emphasis will be on understanding these contributions both in terms of their historical context and their relationship to present-day theories and controversies.\n\nPrerequisite(s): Economics 357 and 359.",
-    "prereqs": [],
+    "prereqs": [
+      357,
+      359
+    ],
     "tags": []
   },
   {
@@ -428,7 +581,11 @@
     "name": "Economics of the Welfare State",
     "year": 3,
     "desc": "The focus is on ideas and economic analysis relevant to understanding the economics of the welfare state, where issues of income redistribution and social insurance are central.\n\nPrerequisite(s): Economics 357, 359 and 395.\n\nAntirequisite(s): Credit for Economics 485 and 599.10 will not be allowed.",
-    "prereqs": [],
+    "prereqs": [
+      357,
+      359,
+      395
+    ],
     "tags": []
   },
   {
@@ -437,7 +594,10 @@
     "name": "Environmental Economics",
     "year": 3,
     "desc": "Applies microeconomic theory to the examination of market failures as the source of environmental problems, and to designing and evaluating environmental policies to correct them.  \n\nPrerequisite(s): Economics 303 and 357.  \n\nAntirequisite(s): Credit for Economics 487 and 499.77 will not be allowed.",
-    "prereqs": [],
+    "prereqs": [
+      303,
+      357
+    ],
     "tags": []
   },
   {
@@ -446,7 +606,9 @@
     "name": "Economics of the Movie Business",
     "year": 3,
     "desc": "Applies microeconomic theory to the motion-picture industry, focusing on how information and extreme uncertainty shape the structure of economic transactions. The historical and institutional illustrations are set in the context of Hollywood.  \n\nPrerequisite(s): Economics 357.\n\nAntirequisite(s): Credit for Economics 489 and 499.63 will not be allowed.",
-    "prereqs": [],
+    "prereqs": [
+      357
+    ],
     "tags": []
   },
   {
@@ -455,7 +617,9 @@
     "name": "Managerial and Decision Economics",
     "year": 3,
     "desc": "Systematic economic analysis in managerial decision-making. Application of practical ideas to business decisions, integrating global business issues and practices with conceptually rigorous economic analysis.  \n\nPrerequisite(s): Economics 357.\n\n Antirequisite(s): Credit for Economics 491 and 499.80 will not be allowed.",
-    "prereqs": [],
+    "prereqs": [
+      357
+    ],
     "tags": []
   },
   {
@@ -464,7 +628,9 @@
     "name": "Empirical Energy Economics",
     "year": 3,
     "desc": "Students will study and learn how to apply methods of data analysis that are particularly useful in the context of energy economics.\n\nPrerequisite(s): Economics 427.",
-    "prereqs": [],
+    "prereqs": [
+      427
+    ],
     "tags": []
   },
   {
@@ -473,8 +639,14 @@
     "name": "Intermediate Econometrics",
     "year": 3,
     "desc": "Theory and application of the multivariable linear regression model in time-series, panel data and limited dependent variable models. Least squares and maximum likelihood estimation. Identification issues, fixed and random effects, and instrumental variables.  \n\nPrerequisite(s): Economics 303, 357 and 395.",
-    "prereqs": [],
-    "tags": []
+    "prereqs": [
+      303,
+      357,
+      395
+    ],
+    "tags": [
+      "honours"
+    ]
   },
   {
     "id": 497,
@@ -482,8 +654,13 @@
     "name": "Advanced Econometrics",
     "year": 3,
     "desc": "Advanced application of statistics and mathematical modeling to make inferences and estimate the magnitude of causal effects.\n\nPrerequisite(s): Economics 495 and Mathematics 211.",
-    "prereqs": [],
-    "tags": []
+    "prereqs": [
+      495,
+      "MATH 211"
+    ],
+    "tags": [
+      "honours"
+    ]
   },
   {
     "id": 499,
@@ -491,79 +668,116 @@
     "name": "Intermediate Topics in Economics",
     "year": 3,
     "desc": "Examination of a particular topic. Examples include advanced game theory, ethics and economics, water resources, and selected topics from other fields of economics.\n\nPrerequisite(s): Economics 357, 359 and 395.\n\nMAY BE REPEATED FOR CREDIT",
-    "prereqs": [],
+    "prereqs": [
+      357,
+      359,
+      395
+    ],
     "tags": []
   },
   {
     "id": 527,
     "dept": "ECON",
     "name": "World Oil Economics",
-    "year": 3,
+    "year": 4,
     "desc": "Analysis of the world oil industry in the post-World War II period.  \n\nPrerequisite(s): Economics 357.",
-    "prereqs": [],
+    "prereqs": [
+      357
+    ],
     "tags": []
   },
   {
     "id": 538,
     "dept": "ECON",
     "name": "Trade, Growth and the Environment",
-    "year": 3,
+    "year": 4,
     "desc": "Advanced examination of the linkages between international trade, the environment, and economic growth.\n\nPrerequisite(s): Economics 395 and 3 units from Economics 425, 475 or 487.\n\nAntirequisite(s): Credit for Economics 538 and 537 will not be allowed.",
-    "prereqs": [],
+    "prereqs": [
+      395,
+      425,
+      475,
+      487
+    ],
     "tags": []
   },
   {
     "id": 541,
     "dept": "ECON",
     "name": "Monetary Theory",
-    "year": 3,
+    "year": 4,
     "desc": "A survey of recent work in monetary theory with primary emphasis on financial issues.\n\nPrerequisite(s): Economics 341, 357 and 359.\n\nCorequisite(s): Prerequisite or Corequisite: Economics 395.",
-    "prereqs": [],
+    "prereqs": [
+      341,
+      357,
+      359
+    ],
     "tags": []
   },
   {
     "id": 557,
     "dept": "ECON",
     "name": "Advanced Microeconomic Theory",
-    "year": 3,
+    "year": 4,
     "desc": "Advanced study of optimal decision rules, equilibrium, and efficiency. Partial and general equilibrium, fundamental welfare theorems, social choice theory, and market failures including market power, public goods, externalities, and asymmetries of information.  \n\nPrerequisite(s): Economics 357, 359 and 387.",
-    "prereqs": [],
-    "tags": []
+    "prereqs": [
+      357,
+      359,
+      387
+    ],
+    "tags": [
+      "honours"
+    ]
   },
   {
     "id": 559,
     "dept": "ECON",
     "name": "Advanced Macroeconomics",
-    "year": 3,
+    "year": 4,
     "desc": "Methodological principles and models that underlie modern analysis of macroeconomics. Advanced study and modeling of the determination of aggregate economic activity and its fluctuations, stabilization policy (fiscal and monetary), the determinants of economic growth, the effects of policy on economic growth, and unemployment and the labour market.\n\nPrerequisite(s): Economics 357, 359, 389 and 395.",
-    "prereqs": [],
-    "tags": []
+    "prereqs": [
+      357,
+      359,
+      389,
+      395
+    ],
+    "tags": [
+      "honours"
+    ]
   },
   {
     "id": 571,
     "dept": "ECON",
     "name": "Competition Policy",
-    "year": 3,
+    "year": 4,
     "desc": "The law and economics of competition policy. An examination of the economics, jurisprudence and history of competition policy towards mergers, price fixing, vertical restraints, and monopolization, primarily in Canada and the United States.\n\nPrerequisite(s): Economics 471.",
-    "prereqs": [],
+    "prereqs": [
+      471
+    ],
     "tags": []
   },
   {
     "id": 588,
     "dept": "ECON",
     "name": "Digital Economics Capstone",
-    "year": 3,
+    "year": 4,
     "desc": "Digital economics research project. Students will use economic reasoning and apply econometric approaches to data to conceptualize and develop a data-based tool that provides value to an organization.\n\nPrerequisite(s): Economics 411 and 495.\n\nAntirequisite(s): Credit for Economics 588 and 599.88 will not be allowed.",
-    "prereqs": [],
+    "prereqs": [
+      411,
+      495
+    ],
     "tags": []
   },
   {
     "id": 599,
     "dept": "ECON",
     "name": "Advanced Topics in Economics",
-    "year": 3,
+    "year": 4,
     "desc": "Examination of a particular topic. Examples include trade policy, monetary economics, time-series econometrics, and analysis of current issues in other fields of economics.\n\nPrerequisite(s): Economics 357, 359, 395 and consent of the Department.\n\nMAY BE REPEATED FOR CREDIT",
-    "prereqs": [],
+    "prereqs": [
+      357,
+      359,
+      395
+    ],
     "tags": []
   },
   {
@@ -842,7 +1056,9 @@
     "name": "Advanced Econometrics II",
     "year": 3,
     "desc": "Focuses on the problem of causality and identification of treatment effects in empirical work in Economics. Topics include but are not limited to randomized trials, causality, instrumental variables, difference in differences, regression discontinuity designs. Students are introduced to empirical applications of these different approaches.\n\nPrerequisite(s): Economics 705.",
-    "prereqs": [],
+    "prereqs": [
+      705
+    ],
     "tags": []
   },
   {
@@ -851,7 +1067,9 @@
     "name": "Advanced Topics in Econometrics",
     "year": 3,
     "desc": "Studies cutting edge econometric tools used to evaluate the impacts of policies, extrapolate their effects to new environments, and predict the effects of policies that have never been tried. Methods from both the structural and treatment effect paradigms of policy evaluation will be considered.\n\nPrerequisite(s): Economics 705.",
-    "prereqs": [],
+    "prereqs": [
+      705
+    ],
     "tags": []
   },
   {
@@ -878,7 +1096,9 @@
     "name": "Advanced Microeconomic Theory II",
     "year": 3,
     "desc": "Building on Economics 707, a comprehensive treatment of game theory, the economics of uncertainty and information, and the theory of incentives will be introduced. Other topics may be included as time and interest allow.\n\nPrerequisite(s): Economics 707.",
-    "prereqs": [],
+    "prereqs": [
+      707
+    ],
     "tags": []
   },
   {
@@ -887,7 +1107,9 @@
     "name": "Advanced Macroeconomics Theory II",
     "year": 3,
     "desc": "Building on Economics 709, a survey of the ideas, controversies, and techniques that constitute modern macroeconomics. The principal issues it covers lie at the heart monetary and fiscal policy and of such important social problems as business cycles and unemployment. The empirical study of key issues raised in theoretical and political debates is also emphasized.\n\nPrerequisite(s): Economics 709.",
-    "prereqs": [],
+    "prereqs": [
+      709
+    ],
     "tags": []
   },
   {
@@ -905,7 +1127,9 @@
     "name": "PhD Research Workshop II",
     "year": 3,
     "desc": "Survey of research methods in economics.\n\nPrerequisite(s): Economics 791 and admission to the PhD program in Economics.\n\nMAY BE REPEATED FOR CREDIT\n\nNOT INCLUDED IN GPA",
-    "prereqs": [],
+    "prereqs": [
+      791
+    ],
     "tags": []
   },
   {
