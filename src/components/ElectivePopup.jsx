@@ -23,6 +23,7 @@ export default function ElectivePopup({ courses, onSelectCourse, onClose, select
       ref={ref}
       onMouseDown={e => e.stopPropagation()}
       onTouchStart={e => e.stopPropagation()}
+      onWheel={e => e.stopPropagation()}
       style={{
         position: 'fixed',
         top: '50%',
@@ -80,8 +81,16 @@ export default function ElectivePopup({ courses, onSelectCourse, onClose, select
         </button>
       </div>
 
+      {/* Custom scrollbar styles */}
+      <style>{`
+        .elective-list::-webkit-scrollbar { width: 5px; }
+        .elective-list::-webkit-scrollbar-track { background: transparent; }
+        .elective-list::-webkit-scrollbar-thumb { background: #2e2e2e; border-radius: 999px; }
+        .elective-list::-webkit-scrollbar-thumb:hover { background: #444; }
+      `}</style>
+
       {/* Course list */}
-      <div style={{ overflowY: 'auto', padding: '8px 8px', display: 'flex', flexDirection: 'column', gap: 5 }}>
+      <div className="elective-list" style={{ overflowY: 'auto', padding: '8px 8px', display: 'flex', flexDirection: 'column', gap: 5, scrollbarGutter: 'stable' }}>
         {courses.map(course => {
           const key = `${course.dept}-${course.id}`
           const isSelected = selectedId === key

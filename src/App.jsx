@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react'
 import courses from './data/courses.json'
-import { buildLayout, getBezier, getColor, resolvePrereq, clampOffset } from './utils/courseUtils'
+import { buildLayout, getBezier, getColor, resolvePrereq, clampOffset, setContentBounds } from './utils/courseUtils'
 import CourseNode from './components/CourseNode'
 import Legend from './components/Legend'
 import LoadingScreen from './components/LoadingScreen'
@@ -23,6 +23,17 @@ export default function App() {
 
   const { layout, collapsedElectives } = buildLayout(courses)
   const getKey = (course) => `${course.dept}-${course.id}`
+
+  // Register content bounds so clampOffset keeps nodes in view during zoom
+  const allPositions = Object.values(layout)
+  if (allPositions.length > 0) {
+    setContentBounds({
+      minX: Math.min(...allPositions.map(p => p.x)) - 90,
+      maxX: Math.max(...allPositions.map(p => p.x)) + 90,
+      minY: Math.min(...allPositions.map(p => p.y)) - 40,
+      maxY: Math.max(...allPositions.map(p => p.y)) + 40,
+    })
+  }
 
   // The course object for the currently selected node (or null)
   const selectedCourse = selectedId

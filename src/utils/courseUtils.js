@@ -132,16 +132,41 @@ export function buildLayout(courses) {
   return { layout: positioned, collapsedElectives }
 }
 
+// Call once after buildLayout to register content bounds for clamping.
+let _contentBounds = null
+export function setContentBounds(bounds) {
+  _contentBounds = bounds
+}
+
 export function clampOffset(x, y, scale) {
   const vw = window.innerWidth
   const vh = window.innerHeight
+  const MARGIN = 120 // px of content that must stay visible on screen
+
+  if (_contentBounds) {
+    // Content edges in screen space (before adding offset)
+    const cLeft   = _contentBounds.minX * scale
+    const cRight  = _contentBounds.maxX * scale
+    const cTop    = _contentBounds.minY * scale
+    const cBottom = _contentBounds.maxY * scale
+
+    // x + cRight >= MARGIN  => right edge of content stays at least MARGIN from left of screen
+    // x + cLeft  <= vw - MARGIN => left edge stays at least MARGIN from right of screen
+    const minX = MARGIN - cRight
+    const maxX = vw - MARGIN - cLeft
+    const minY = MARGIN - cBottom
+    const maxY = vh - MARGIN - cTop
+
+    return {
+      x: Math.min(maxX, Math.max(minX, x)),
+      y: Math.min(maxY, Math.max(minY, y)),
+    }
+  }
+
+  // Fallback before bounds are registered
   const pad = 0.85
-  const minX = -4000 * scale + vw * pad
-  const maxX = vw * (1 - pad + 1)
-  const minY = -4000 * scale + vh * pad
-  const maxY = vh * (1 - pad + 1)
   return {
-    x: Math.min(maxX, Math.max(minX, x)),
-    y: Math.min(maxY, Math.max(minY, y)),
+    x: Math.min(vw * 2, Math.max(-4000 * scale + vw * pad, x)),
+    y: Math.min(vh * 2, Math.max(-4000 * scale + vh * pad, y)),
   }
 }
