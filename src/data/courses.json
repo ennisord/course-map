@@ -1,5 +1,38 @@
 [
   {
+    "id": 213,
+    "dept": "STAT",
+    "name": "Introductory Statistics I",
+    "year": 1,
+    "desc": "Introduction to probability, including Bayes' law, expectations and distributions. Discrete and continuous random variables, including properties of the normal curve. Collection and visual display of single and multi-dimensional data. Introduction to statistical modelling and estimation. Parametric and simulation-based confidence interval estimation.",
+    "prereqs": [],
+    "tags": ["core"]
+  },
+  {
+    "id": 217,
+    "dept": "STAT",
+    "name": "Introductory Statistics I",
+    "year": 1,
+    "prereqs": ["STAT 213"],
+    "tags": ["core"]
+  },
+  {
+    "id": 249,
+    "dept": "MATH",
+    "name": "Calculus I",
+    "year": 1,
+    "prereqs": [],
+    "tags": ["core"]
+  },
+  {
+    "id": 211,
+    "dept": "MATH",
+    "name": "Linear Methods I",
+    "year": 1,
+    "prereqs": [],
+    "tags": ["honours"]
+  },
+  {
     "id": 201,
     "dept": "ECON",
     "name": "Principles of Microeconomics",
