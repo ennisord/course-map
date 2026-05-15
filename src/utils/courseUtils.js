@@ -28,23 +28,47 @@ export function getBezier(x1, y1, x2, y2) {
   return `M ${x1} ${y1} C ${cx} ${y1}, ${cx} ${y2}, ${x2} ${y2}`
 }
 
+// Returns { layout, collapsedElectives }
+// layout: { [key]: { x, y } } — only core/honours courses + one ghost node per zone that has electives
+// collapsedElectives: { [zoneGhostKey]: { courses: [...], x, y } }
 export function buildLayout(courses) {
   const ZONE_GAP = 320
   const SUBCOL_GAP = 220
   const ROW_GAP = 100
 
+  // Separate visible (core/honours) from electives (tags: [])
+  const isElective = c => c.tags.length === 0
+  const visibleCourses = courses.filter(c => !isElective(c))
+  const electiveCourses = courses.filter(isElective)
+
   const byZone = {}
-  courses.forEach(c => {
+  visibleCourses.forEach(c => {
     const zone = Math.floor(c.id / 100)
     if (!byZone[zone]) byZone[zone] = []
     byZone[zone].push(c)
   })
 
+  // Also track which zones have electives
+  const electivesByZone = {}
+  electiveCourses.forEach(c => {
+    const zone = Math.floor(c.id / 100)
+    if (!electivesByZone[zone]) electivesByZone[zone] = []
+    electivesByZone[zone].push(c)
+  })
+
+  // Make sure zones with electives but no visible courses still get a zone entry
+  Object.keys(electivesByZone).forEach(zone => {
+    if (!byZone[zone]) byZone[zone] = []
+  })
+
   const positioned = {}
   const sortedZones = Object.keys(byZone).map(Number).sort()
-  const globalMax = Math.max(...Object.values(byZone).map(g => g.length))
+  const allGroupSizes = sortedZones.map(z => byZone[z].length + (electivesByZone[z] ? 1 : 0))
+  const globalMax = Math.max(...allGroupSizes, 1)
   const globalHeight = (globalMax - 1) * ROW_GAP
   let zoneX = 0
+
+  const collapsedElectives = {}
 
   sortedZones.forEach(zone => {
     const group = byZone[zone]
@@ -83,11 +107,29 @@ export function buildLayout(courses) {
       })
     })
 
-    const maxSubcol = Math.max(...Object.keys(bySubcol).map(Number))
+    // Place ghost node for electives in this zone
+    if (electivesByZone[zone]) {
+      // Find the bottom-most y in subcol 0 of this zone, place ghost below it
+      const col0Courses = bySubcol[0] || []
+      const col0Ys = col0Courses.map(c => positioned[`${c.dept}-${c.id}`]?.y ?? 0)
+      const bottomY = col0Ys.length > 0 ? Math.max(...col0Ys) + ROW_GAP : globalHeight / 2
+      const ghostX = zoneX
+      const ghostKey = `ghost-${zone}`
+      positioned[ghostKey] = { x: ghostX, y: bottomY }
+      collapsedElectives[ghostKey] = {
+        courses: electivesByZone[zone],
+        x: ghostX,
+        y: bottomY,
+      }
+    }
+
+    const maxSubcol = bySubcol && Object.keys(bySubcol).length > 0
+      ? Math.max(...Object.keys(bySubcol).map(Number))
+      : 0
     zoneX += ZONE_GAP + maxSubcol * SUBCOL_GAP
   })
 
-  return positioned
+  return { layout: positioned, collapsedElectives }
 }
 
 export function clampOffset(x, y, scale) {

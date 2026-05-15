@@ -5,6 +5,7 @@ import CourseNode from './components/CourseNode'
 import Legend from './components/Legend'
 import LoadingScreen from './components/LoadingScreen'
 import CourseDetailPanel from './components/CourseDetailPanel'
+import ElectivePopup from './components/ElectivePopup'
 
 const WORD = 'Course Map'
 
@@ -14,11 +15,13 @@ export default function App() {
   const [dragging, setDragging] = useState(false)
   const [selectedId, setSelectedId] = useState(null)
   const [loading, setLoading] = useState(true)
+  // Popup state: { ghostKey, anchorPos: { x, y } } | null
+  const [popup, setPopup] = useState(null)
   const startRef = useRef({ x: 0, y: 0 })
   const lastPinchRef = useRef(null)
   const didDragRef = useRef(false)
 
-  const layout = buildLayout(courses)
+  const { layout, collapsedElectives } = buildLayout(courses)
   const getKey = (course) => `${course.dept}-${course.id}`
 
   // The course object for the currently selected node (or null)
@@ -140,7 +143,14 @@ export default function App() {
 
   const onTouchEnd = () => { setDragging(false); lastPinchRef.current = null }
 
+  const handleGhostClick = (ghostKey) => {
+    if (didDragRef.current) return
+    setPopup(prev => prev?.ghostKey === ghostKey ? null : { ghostKey })
+  }
+
   if (loading) return <LoadingScreen />
+
+  const popupElectives = popup ? collapsedElectives[popup.ghostKey] : null
 
   return (
     <div
@@ -184,28 +194,93 @@ export default function App() {
           })}
         </svg>
 
-        {courses.map(course => {
-          const key = getKey(course)
-          const pos = layout[key]
-          const selected = selectedId === key || connectedIds.has(key)
+        {/* Regular course nodes */}
+        {courses
+          .filter(c => c.tags.length > 0) // only core/honours visible in DAG
+          .map(course => {
+            const key = getKey(course)
+            const pos = layout[key]
+            const selected = selectedId === key || connectedIds.has(key)
+            return (
+              <CourseNode
+                key={key}
+                course={course}
+                pos={pos}
+                selected={selected}
+                onDragStart={(e) => {
+                  const clientX = e.touches ? e.touches[0].clientX : e.clientX
+                  const clientY = e.touches ? e.touches[0].clientY : e.clientY
+                  beginDrag(clientX, clientY)
+                }}
+                onClick={() => {
+                  if (!didDragRef.current) setSelectedId(prev => prev === key ? null : key)
+                }}
+              />
+            )
+          })}
+
+        {/* Ghost nodes for collapsed electives */}
+        {Object.entries(collapsedElectives).map(([ghostKey, { courses: electives, x, y }]) => {
+          const isOpen = popup?.ghostKey === ghostKey
           return (
-            <CourseNode
-              key={key}
-              course={course}
-              pos={pos}
-              selected={selected}
-              onDragStart={(e) => {
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX
-                const clientY = e.touches ? e.touches[0].clientY : e.clientY
-                beginDrag(clientX, clientY)
+            <div
+              key={ghostKey}
+              className="absolute select-none -translate-x-1/2 -translate-y-1/2 cursor-pointer"
+              style={{
+                left: x,
+                top: y,
+                width: 176,
+                fontFamily: "'League Spartan', sans-serif",
               }}
-              onClick={() => {
-                if (!didDragRef.current) setSelectedId(prev => prev === key ? null : key)
-              }}
-            />
+              onMouseDown={e => { e.stopPropagation(); beginDrag(e.clientX, e.clientY) }}
+              onTouchStart={e => { e.stopPropagation(); beginDrag(e.touches[0].clientX, e.touches[0].clientY) }}
+              onClick={() => handleGhostClick(ghostKey)}
+            >
+              <div style={{
+                background: isOpen ? '#1e1e1e' : '#161616',
+                border: `1px dashed ${isOpen ? '#555' : '#333'}`,
+                borderRadius: 10,
+                padding: '7px 12px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                transition: 'border-color 0.15s, background 0.15s',
+              }}>
+                {/* Grid icon */}
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={isOpen ? '#888' : '#444'} strokeWidth="2" strokeLinecap="round" style={{ flexShrink: 0, transition: 'stroke 0.15s' }}>
+                  <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                  <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+                </svg>
+                <div>
+                  <div style={{ color: isOpen ? '#aaa' : '#666', fontSize: 11, fontWeight: 600, letterSpacing: '0.03em', transition: 'color 0.15s' }}>
+                    {electives.length} elective{electives.length !== 1 ? 's' : ''}
+                  </div>
+                  <div style={{ color: '#3a3a3a', fontSize: 10, marginTop: 1 }}>
+                    click to browse
+                  </div>
+                </div>
+                <svg
+                  width="10" height="10" viewBox="0 0 24 24" fill="none"
+                  stroke={isOpen ? '#666' : '#333'} strokeWidth="2.5" strokeLinecap="round"
+                  style={{ marginLeft: 'auto', flexShrink: 0, transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s, stroke 0.15s' }}
+                >
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </div>
+            </div>
           )
         })}
       </div>
+
+      {/* Elective popup — outside the panning layer, fixed position */}
+      {popup && popupElectives && (
+        <ElectivePopup
+          courses={popupElectives.courses}
+          selectedId={selectedId}
+          onSelectCourse={(course) => setSelectedId(getKey(course))}
+          onClose={() => setPopup(null)}
+        />
+      )}
 
       {/* Course detail panel — sits outside the panning layer so it stays fixed */}
       <CourseDetailPanel
