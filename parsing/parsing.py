@@ -137,6 +137,8 @@ with open(INPUT_CSV, newline='', encoding='utf-8-sig') as csvfile:
 
         name = (row.get(COL_NAME) or "").strip()
         desc = (row.get(COL_DESC) or "").strip()
+        prereqs = extract_prereqs(desc)
+        desc = re.sub(r'\s*Prereq(?:uisite)?s?\s*\([^)]*\)?\s*:.*', '', desc, flags=re.IGNORECASE | re.DOTALL).strip()
 
         key = (dept, course_id)
         if key in CORE_IDS:
@@ -152,7 +154,7 @@ with open(INPUT_CSV, newline='', encoding='utf-8-sig') as csvfile:
             "name": name,
             "year": infer_year(course_id),
             "desc": desc,
-            "prereqs": extract_prereqs(desc),
+            "prereqs": prereqs,
             "tags": tags,
         }
 
