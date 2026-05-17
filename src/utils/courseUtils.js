@@ -34,7 +34,7 @@ export function getBezier(x1, y1, x2, y2) {
 export function buildLayout(courses) {
   const ZONE_GAP = 320
   const SUBCOL_GAP = 220
-  const ROW_GAP = 100
+  const ROW_GAP = 140
 
   // Separate visible (core/honours) from electives (tags: [])
   const isElective = c => c.tags.length === 0

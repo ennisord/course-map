@@ -180,30 +180,6 @@ export default function App() {
         top: 0,
         left: 0,
       }}>
-        <svg className="absolute top-0 left-0 overflow-visible pointer-events-none" style={{ width: 4000, height: 4000 }}>
-          {courses.map(course => {
-            const key = getKey(course)
-            const from = layout[key]
-            return course.prereqs.map((prereq, i) => {
-              const prereqKey = resolvePrereq(prereq, courses)
-              if (!prereqKey) return null
-              const to = layout[prereqKey]
-              if (!from || !to) return null
-              const isHighlighted = selectedId === key || selectedId === prereqKey
-              const { border } = getColor(course.tags)
-              return (
-                <path
-                  key={`${key}-${i}`}
-                  d={getBezier(to.x, to.y, from.x, from.y)}
-                  stroke={border}
-                  strokeWidth={isHighlighted ? 2 : 1.5}
-                  fill="none"
-                  opacity={isHighlighted ? 1 : 0.5}
-                />
-              )
-            })
-          })}
-        </svg>
 
         {/* Regular course nodes */}
         {courses
@@ -226,6 +202,8 @@ export default function App() {
                 onClick={() => {
                   if (!didDragRef.current) setSelectedId(prev => prev === key ? null : key)
                 }}
+                courses={courses}
+                onSelectCourse={(prereqKey) => setSelectedId(prereqKey)}
               />
             )
           })}
