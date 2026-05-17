@@ -181,6 +181,33 @@ export default function App() {
         left: 0,
       }}>
 
+        {/* Bezier curves — only for selected and connected nodes */}
+        <svg className="absolute top-0 left-0 overflow-visible pointer-events-none" style={{ width: 4000, height: 4000 }}>
+          {courses.map(course => {
+            const key = getKey(course)
+            const from = layout[key]
+            if (!from) return null
+            if (selectedId !== key) return null
+            return course.prereqs.map((prereq, i) => {
+              const prereqKey = resolvePrereq(prereq, courses)
+              if (!prereqKey) return null
+              const to = layout[prereqKey]
+              if (!to) return null
+              const { border } = getColor(course.tags)
+              return (
+                <path
+                  key={`${key}-${i}`}
+                  d={getBezier(to.x, to.y, from.x, from.y)}
+                  stroke={border}
+                  strokeWidth={2}
+                  fill="none"
+                  opacity={0.85}
+                />
+              )
+            })
+          })}
+        </svg>
+
         {/* Regular course nodes */}
         {courses
           .filter(c => c.tags.length > 0) // only core/honours visible in DAG
