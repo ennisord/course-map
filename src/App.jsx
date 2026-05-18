@@ -305,7 +305,10 @@ export default function App() {
         onClose={() => setSelectedId(null)}
       />
 
-      <Legend />
+      <Legend
+        onZoomIn={() => applyZoom(0.15, window.innerWidth / 2, window.innerHeight / 2)}
+        onZoomOut={() => applyZoom(-0.15, window.innerWidth / 2, window.innerHeight / 2)}
+      />
     </div>
   )
 }
