@@ -241,6 +241,7 @@ export default function App() {
           return (
             <div
               key={ghostKey}
+              data-ghost="true"
               className="absolute select-none -translate-x-1/2 -translate-y-1/2 cursor-pointer"
               style={{
                 left: x,

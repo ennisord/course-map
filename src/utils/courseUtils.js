@@ -110,7 +110,7 @@ export function buildLayout(courses) {
 
     Object.entries(bySubcol).forEach(([sc, subgroup]) => {
       const colHeight = (subgroup.length - 1) * ROW_GAP
-      const startY = (globalHeight - colHeight) / 2
+      const startY = 50
       subgroup.forEach((c, i) => {
         positioned[`${c.dept}-${c.id}`] = {
           x: zoneX + parseInt(sc) * SUBCOL_GAP,
@@ -124,7 +124,7 @@ export function buildLayout(courses) {
       // Find the bottom-most y in subcol 0 of this zone, place ghost below it
       const col0Courses = bySubcol[0] || []
       const col0Ys = col0Courses.map(c => positioned[`${c.dept}-${c.id}`]?.y ?? 0)
-      const bottomY = col0Ys.length > 0 ? Math.max(...col0Ys) + ROW_GAP : globalHeight / 2
+      const bottomY = col0Ys.length > 0 ? Math.max(...col0Ys) + ROW_GAP : 40
       const ghostX = zoneX
       const ghostKey = `ghost-${zone}`
       positioned[ghostKey] = { x: ghostX, y: bottomY }

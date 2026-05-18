@@ -15,7 +15,6 @@ export default function CourseNode({ course, pos, selected, onDragStart, onClick
       : getGlow(course.tags)
     : 'none'
 
-  // Resolve each prereq to a display label and a course key
   const prereqBlobs = course.prereqs.map(prereq => {
     const key = resolvePrereq(prereq, courses)
     const prereqCourse = key ? courses.find(c => `${c.dept}-${c.id}` === key) : null
@@ -30,6 +29,11 @@ export default function CourseNode({ course, pos, selected, onDragStart, onClick
     return { key, label, prereqCourse }
   })
 
+  // Card height is fixed ~68px. Blobs are absolutely positioned below so they
+  // don't affect the outer div height, keeping -translate-y-1/2 centering correct
+  // for bezier curve endpoints.
+  const CARD_HEIGHT = 68
+
   return (
     <div
       className="absolute select-none w-44 -translate-x-1/2 -translate-y-1/2"
@@ -37,11 +41,12 @@ export default function CourseNode({ course, pos, selected, onDragStart, onClick
         left: pos.x,
         top: pos.y,
         fontFamily: "'League Spartan', sans-serif",
+        height: CARD_HEIGHT,
       }}
     >
       {/* Main card */}
       <div
-        className="rounded-lg bg-[#1a1a1a] px-3 py-2 cursor-pointer"
+        className="rounded-lg bg-[#1a1a1a] px-3 py-2 cursor-pointer h-full"
         style={{
           border: `1px solid ${border}`,
           boxShadow: glow,
@@ -91,9 +96,12 @@ export default function CourseNode({ course, pos, selected, onDragStart, onClick
         </div>
       </div>
 
-      {/* Prereq blobs */}
+      {/* Prereq blobs — absolutely positioned below card, don't affect outer div height */}
       {prereqBlobs.length > 0 && (
-        <div className="flex flex-wrap gap-1 mt-1.5 px-1">
+        <div
+          className="flex flex-wrap gap-1 px-1"
+          style={{ position: 'absolute', top: CARD_HEIGHT + 6, left: 0, width: '100%' }}
+        >
           {prereqBlobs.map(({ key, label, prereqCourse }) => (
             <button
               key={key ?? label}
