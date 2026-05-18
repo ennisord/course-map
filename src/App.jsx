@@ -292,6 +292,7 @@ export default function App() {
       {popup && popupElectives && (
         <ElectivePopup
           courses={popupElectives.courses}
+          allCourses={courses}
           selectedId={selectedId}
           onSelectCourse={(course) => setSelectedId(getKey(course))}
           onClose={() => setPopup(null)}

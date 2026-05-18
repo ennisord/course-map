@@ -1,8 +1,11 @@
 import { useEffect, useRef } from 'react'
-import { getColor } from '../utils/courseUtils'
+import { getColor, resolvePrereq } from '../utils/courseUtils'
 
-export default function ElectivePopup({ courses, onSelectCourse, onClose, selectedId }) {
+const isMobile = () => window.innerWidth < 768
+
+export default function ElectivePopup({ courses, onSelectCourse, onClose, selectedId, allCourses }) {
   const ref = useRef(null)
+  const mountedRef = useRef(false)
 
   useEffect(() => {
     const handler = (e) => {
@@ -15,6 +18,17 @@ export default function ElectivePopup({ courses, onSelectCourse, onClose, select
       document.removeEventListener('touchstart', handler)
     }
   }, [onClose])
+
+  useEffect(() => {
+    if (!mountedRef.current) {
+      mountedRef.current = true
+      return
+    }
+    if (!selectedId) return
+    const isElective = courses.some(c => `${c.dept}-${c.id}` === selectedId)
+    if (isElective) return
+    if (!isMobile()) onClose()
+  }, [selectedId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!courses.length) return null
 
@@ -95,11 +109,27 @@ export default function ElectivePopup({ courses, onSelectCourse, onClose, select
           const key = `${course.dept}-${course.id}`
           const isSelected = selectedId === key
           const { border, text, muted } = getColor(course.tags)
+
+          const blobs = (course.prereqs || []).map(prereq => {
+            const prereqKey = resolvePrereq(prereq, allCourses || courses)
+            const prereqCourse = prereqKey ? (allCourses || courses).find(c => `${c.dept}-${c.id}` === prereqKey) : null
+            let label
+            if (prereqCourse) {
+              label = prereqCourse.dept === 'ECON' ? String(prereqCourse.id) : `${prereqCourse.dept} ${prereqCourse.id}`
+            } else {
+              label = typeof prereq === 'number' ? String(prereq) : prereq
+            }
+            return { prereqKey, label }
+          })
+
           return (
             <button
               key={key}
               onMouseDown={e => e.stopPropagation()}
-              onClick={() => onSelectCourse(course)}
+              onClick={() => {
+                onSelectCourse(course)
+                if (isMobile()) onClose()
+              }}
               style={{
                 background: isSelected ? '#1e1e1e' : '#1a1a1a',
                 border: `1px solid ${isSelected ? text : border}`,
@@ -116,23 +146,41 @@ export default function ElectivePopup({ courses, onSelectCourse, onClose, select
                 e.currentTarget.style.borderColor = text
               }}
               onMouseLeave={e => {
-                e.currentTarget.style.background = '#1a1a1a'
-                e.currentTarget.style.borderColor = border
+                e.currentTarget.style.background = isSelected ? '#1e1e1e' : '#1a1a1a'
+                e.currentTarget.style.borderColor = isSelected ? text : border
               }}
             >
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 2 }}>
                 <span style={{ color: text, fontSize: 12, fontWeight: 700, letterSpacing: '0.04em' }}>
                   {course.dept} {course.id}
                 </span>
-                {course.prereqs.length > 0 && (
-                  <span style={{ color: '#444', fontSize: 10 }}>
-                    {course.prereqs.length} prereq{course.prereqs.length !== 1 ? 's' : ''}
-                  </span>
-                )}
               </div>
-              <div style={{ color: muted, fontSize: 11, lineHeight: 1.4, whiteSpace: 'normal' }}>
+              <div style={{ color: muted, fontSize: 11, lineHeight: 1.4, whiteSpace: 'normal', marginBottom: blobs.length ? 7 : 0 }}>
                 {course.name}
               </div>
+
+              {blobs.length > 0 && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                  {blobs.map(({ prereqKey, label }) => (
+                    <span
+                      key={prereqKey ?? label}
+                      style={{
+                        background: '#181818',
+                        border: '1px solid #4a4a4a',
+                        borderRadius: 999,
+                        padding: '1px 7px',
+                        fontSize: 10,
+                        fontWeight: 600,
+                        color: '#727272',
+                        letterSpacing: '0.03em',
+                        lineHeight: 1.6,
+                      }}
+                    >
+                      {label}
+                    </span>
+                  ))}
+                </div>
+              )}
             </button>
           )
         })}
