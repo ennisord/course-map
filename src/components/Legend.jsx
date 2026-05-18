@@ -188,17 +188,17 @@ export default function Legend({ onZoomIn, onZoomOut, onOpenWishlist, onOpenComp
 
         {/* Fine print */}
         <div style={{ marginTop: 3, display: 'flex', alignItems: 'center', gap: 5, pointerEvents: 'auto' }}>
-          <span style={{ fontSize: 12, color: '#747474', letterSpacing: '0.02em', whiteSpace: 'nowrap' }}>© 2025 Ennis</span>
+          <span style={{ fontSize: 12, color: '#747474', letterSpacing: '0.02em', whiteSpace: 'nowrap' }}>© 2025 Ennis L.</span>
           <span style={{ fontSize: 12, color: '#747474' }}>·</span>
           <a
-            href="https://github.com/"
+            href="https://github.com/ennisord/course-map"
             target="_blank"
             rel="noopener noreferrer"
             style={{ fontSize: 12, color: '#848484', textDecoration: 'none', letterSpacing: '0.02em', transition: 'color 0.15s', whiteSpace: 'nowrap' }}
             onMouseEnter={e => e.currentTarget.style.color = '#969696'}
             onMouseLeave={e => e.currentTarget.style.color = '#747474'}
           >
-            GitHub
+            View on GitHub
           </a>
         </div>
 
