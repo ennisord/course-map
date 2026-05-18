@@ -6,6 +6,8 @@ import Legend from './components/Legend'
 import LoadingScreen from './components/LoadingScreen'
 import CourseDetailPanel from './components/CourseDetailPanel'
 import ElectivePopup from './components/ElectivePopup'
+import SearchPopup from './components/SearchPopup'
+
 
 const WORD = 'Course Map'
 
@@ -34,6 +36,8 @@ export default function App() {
   const startRef = useRef({ x: 0, y: 0 })
   const lastPinchRef = useRef(null)
   const didDragRef = useRef(false)
+  const [searchOpen, setSearchOpen] = useState(false)
+
 
   const { layout, collapsedElectives, zoneExtents } = buildLayout(courses)
   const getKey = (course) => `${course.dept}-${course.id}`
@@ -367,6 +371,14 @@ export default function App() {
         />
       )}
 
+      {searchOpen && (
+        <SearchPopup
+          courses={courses}
+          onSelectCourse={(course) => { setSelectedId(getKey(course)); setSearchOpen(false) }}
+          onClose={() => setSearchOpen(false)}
+        />
+      )}
+
       {/* Course detail panel */}
       <CourseDetailPanel
         course={selectedCourse}
@@ -377,6 +389,7 @@ export default function App() {
       <Legend
         onZoomIn={() => applyZoom(0.15, window.innerWidth / 2, window.innerHeight / 2)}
         onZoomOut={() => applyZoom(-0.15, window.innerWidth / 2, window.innerHeight / 2)}
+        onOpenSearch={() => setSearchOpen(true)}
       />
     </div>
   )
