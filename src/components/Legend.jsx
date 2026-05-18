@@ -32,17 +32,22 @@ export default function Legend({ onZoomIn, onZoomOut }) {
       style={{ fontFamily: "'League Spartan', sans-serif" }}
     >
       {/* Zoom controls */}
-      <div className="flex gap-1.5 mb-1 pointer-events-auto">
+      <div className="flex items-center mb-1 pointer-events-auto" style={{ background: '#1a1a1a', border: '1px solid #2e2e2e', borderRadius: 8, overflow: 'hidden', width: 'fit-content' }}>
         <button
-          style={btnStyle}
+          style={{ ...btnStyle, border: 'none', borderRadius: 0 }}
           onMouseEnter={hover}
           onMouseLeave={unhover}
           onMouseDown={e => e.stopPropagation()}
           onClick={onZoomIn}
           title="Zoom in"
         >+</button>
+        <div style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth="2.5" strokeLinecap="round">
+            <circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/>
+          </svg>
+        </div>
         <button
-          style={btnStyle}
+          style={{ ...btnStyle, border: 'none', borderRadius: 0 }}
           onMouseEnter={hover}
           onMouseLeave={unhover}
           onMouseDown={e => e.stopPropagation()}
