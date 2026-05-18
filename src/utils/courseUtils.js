@@ -32,8 +32,8 @@ export function getBezier(x1, y1, x2, y2) {
 // layout: { [key]: { x, y } } — only core/honours courses + one ghost node per zone that has electives
 // collapsedElectives: { [zoneGhostKey]: { courses: [...], x, y } }
 export function buildLayout(courses) {
-  const ZONE_GAP = 320
-  const SUBCOL_GAP = 220
+  const ZONE_GAP = 400
+  const SUBCOL_GAP = 250
   const ROW_GAP = 140
 
   // Separate visible (core/honours) from electives (tags: [])
@@ -76,16 +76,28 @@ export function buildLayout(courses) {
 
     const subcol = {}
     const getSubcol = (course) => {
-      if (subcol[course.id] !== undefined) return subcol[course.id]
-      const inZonePrereqs = course.prereqs.filter(p => typeof p === 'number' && idSet.has(p))
-      if (inZonePrereqs.length === 0) { subcol[course.id] = 0; return 0 }
-      const max = Math.max(...inZonePrereqs.map(pid => {
-        const prereq = group.find(c => c.id === pid)
-        return prereq ? getSubcol(prereq) : 0
-      }))
-      subcol[course.id] = max + 1
-      return max + 1
-    }
+  if (subcol[course.id] !== undefined) return subcol[course.id]
+
+  const inZonePrereqs = course.prereqs.filter(p => {
+    if (typeof p === 'number') return idSet.has(p)
+    // resolve string prereqs like "STAT 213"
+    const parts = p.trim().split(/\s+/)
+    if (parts.length < 2) return false
+    const pid = parseInt(parts[1])
+    return idSet.has(pid)
+  }).map(p => {
+    if (typeof p === 'number') return p
+    return parseInt(p.trim().split(/\s+/)[1])
+  })
+
+  if (inZonePrereqs.length === 0) { subcol[course.id] = 0; return 0 }
+  const max = Math.max(...inZonePrereqs.map(pid => {
+    const prereq = group.find(c => c.id === pid)
+    return prereq ? getSubcol(prereq) : 0
+  }))
+  subcol[course.id] = max + 1
+  return max + 1
+}
 
     group.forEach(c => getSubcol(c))
 

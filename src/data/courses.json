@@ -25,14 +25,6 @@
     "tags": ["core"]
   },
   {
-    "id": 211,
-    "dept": "MATH",
-    "name": "Linear Methods I",
-    "year": 1,
-    "prereqs": [],
-    "tags": ["honours"]
-  },
-  {
     "id": 201,
     "dept": "ECON",
     "name": "Principles of Microeconomics",
@@ -53,6 +45,14 @@
     "tags": [
       "core"
     ]
+  },
+  {
+    "id": 211,
+    "dept": "MATH",
+    "name": "Linear Methods I",
+    "year": 1,
+    "prereqs": [],
+    "tags": ["honours"]
   },
   {
     "id": 209,
