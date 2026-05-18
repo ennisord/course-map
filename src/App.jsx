@@ -9,22 +9,33 @@ import ElectivePopup from './components/ElectivePopup'
 
 const WORD = 'Course Map'
 
+// Edit these subheaders to match your department's language
+const ZONE_LABELS = {
+  1: { title: '100-level', sub: 'Foundations' },
+  2: { title: '200-level', sub: 'Core methods' },
+  3: { title: '300-level', sub: 'Intermediate theory' },
+  4: { title: '400-level', sub: 'Advanced topics' },
+  5: { title: '500-level', sub: 'Graduate / honours' },
+}
+
+// How far above the node layer (y=50) the bracket sits.
+// Increase this value for more breathing room.
+const LABEL_OFFSET_Y = -80
+
 export default function App() {
   const [offset, setOffset] = useState({ x: 100, y: 200 })
   const [scale, setScale] = useState(1)
   const [dragging, setDragging] = useState(false)
   const [selectedId, setSelectedId] = useState(null)
   const [loading, setLoading] = useState(true)
-  // Popup state: { ghostKey, anchorPos: { x, y } } | null
   const [popup, setPopup] = useState(null)
   const startRef = useRef({ x: 0, y: 0 })
   const lastPinchRef = useRef(null)
   const didDragRef = useRef(false)
 
-  const { layout, collapsedElectives } = buildLayout(courses)
+  const { layout, collapsedElectives, zoneExtents } = buildLayout(courses)
   const getKey = (course) => `${course.dept}-${course.id}`
 
-  // Register content bounds so clampOffset keeps nodes in view during zoom
   const allPositions = Object.values(layout)
   if (allPositions.length > 0) {
     setContentBounds({
@@ -35,7 +46,6 @@ export default function App() {
     })
   }
 
-  // The course object for the currently selected node (or null)
   const selectedCourse = selectedId
     ? courses.find(c => getKey(c) === selectedId) ?? null
     : null
@@ -163,6 +173,11 @@ export default function App() {
 
   const popupElectives = popup ? collapsedElectives[popup.ghostKey] : null
 
+  // Bracket geometry constants
+  const BRACKET_TICK = 8
+  const BRACKET_RADIUS = 4
+  const bracketY = LABEL_OFFSET_Y + 36
+
   return (
     <div
       onMouseDown={onMouseDown}
@@ -180,6 +195,57 @@ export default function App() {
         top: 0,
         left: 0,
       }}>
+
+        {/* Zone overbrace labels */}
+        <svg
+          className="absolute top-0 left-0 overflow-visible pointer-events-none"
+          style={{ width: 4000, height: 4000 }}
+        >
+          {Object.entries(zoneExtents).map(([zone, { startX, endX }]) => {
+            const label = ZONE_LABELS[Number(zone)]
+            if (!label) return null
+            const midX = (startX + endX) / 2
+            const r = BRACKET_RADIUS
+            const tick = BRACKET_TICK
+
+            return (
+              <g key={zone} style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                {/* Rectangular overbrace: left tick → rounded corner → bar → rounded corner → right tick */}
+                <path
+                  d={`M ${startX} ${bracketY + tick} L ${startX} ${bracketY + r} Q ${startX} ${bracketY} ${startX + r} ${bracketY} L ${endX - r} ${bracketY} Q ${endX} ${bracketY} ${endX} ${bracketY + r} L ${endX} ${bracketY + tick}`}
+                  fill="none"
+                  stroke="#2e2e2e"
+                  strokeWidth={1.5}
+                  strokeLinecap="round"
+                />
+                {/* Level title e.g. "100-level" */}
+                <text
+                  x={midX}
+                  y={LABEL_OFFSET_Y + 22}
+                  textAnchor="middle"
+                  fill="#666"
+                  fontSize={12}
+                  fontWeight={600}
+                  letterSpacing="0.06em"
+                >
+                  {label.title.toUpperCase()}
+                </text>
+                {/* Subheader */}
+                <text
+                  x={midX}
+                  y={LABEL_OFFSET_Y + 8}
+                  textAnchor="middle"
+                  fill="#3a3a3a"
+                  fontSize={10}
+                  fontWeight={400}
+                  letterSpacing="0.03em"
+                >
+                  {label.sub}
+                </text>
+              </g>
+            )
+          })}
+        </svg>
 
         {/* Bezier curves — only for selected and connected nodes */}
         <svg className="absolute top-0 left-0 overflow-visible pointer-events-none" style={{ width: 4000, height: 4000 }}>
@@ -210,7 +276,7 @@ export default function App() {
 
         {/* Regular course nodes */}
         {courses
-          .filter(c => c.tags.length > 0) // only core/honours visible in DAG
+          .filter(c => c.tags.length > 0)
           .map(course => {
             const key = getKey(course)
             const pos = layout[key]
@@ -263,7 +329,6 @@ export default function App() {
                 gap: 8,
                 transition: 'border-color 0.15s, background 0.15s',
               }}>
-                {/* Grid icon */}
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={isOpen ? '#888' : '#444'} strokeWidth="2" strokeLinecap="round" style={{ flexShrink: 0, transition: 'stroke 0.15s' }}>
                   <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
                   <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
@@ -300,7 +365,7 @@ export default function App() {
         />
       )}
 
-      {/* Course detail panel — sits outside the panning layer so it stays fixed */}
+      {/* Course detail panel */}
       <CourseDetailPanel
         course={selectedCourse}
         courses={courses}

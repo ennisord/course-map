@@ -28,13 +28,15 @@ export function getBezier(x1, y1, x2, y2) {
   return `M ${x1} ${y1} C ${cx} ${y1}, ${cx} ${y2}, ${x2} ${y2}`
 }
 
-// Returns { layout, collapsedElectives }
+// Returns { layout, collapsedElectives, zoneExtents }
 // layout: { [key]: { x, y } } — only core/honours courses + one ghost node per zone that has electives
 // collapsedElectives: { [zoneGhostKey]: { courses: [...], x, y } }
+// zoneExtents: { [zone]: { startX, endX } } — pixel bounds of each zone column
 export function buildLayout(courses) {
   const ZONE_GAP = 400
   const SUBCOL_GAP = 250
   const ROW_GAP = 140
+  const NODE_WIDTH = 176
 
   // Separate visible (core/honours) from electives (tags: [])
   const isElective = c => c.tags.length === 0
@@ -69,6 +71,7 @@ export function buildLayout(courses) {
   let zoneX = 0
 
   const collapsedElectives = {}
+  const zoneExtents = {}
 
   sortedZones.forEach(zone => {
     const group = byZone[zone]
@@ -76,28 +79,27 @@ export function buildLayout(courses) {
 
     const subcol = {}
     const getSubcol = (course) => {
-  if (subcol[course.id] !== undefined) return subcol[course.id]
+      if (subcol[course.id] !== undefined) return subcol[course.id]
 
-  const inZonePrereqs = course.prereqs.filter(p => {
-    if (typeof p === 'number') return idSet.has(p)
-    // resolve string prereqs like "STAT 213"
-    const parts = p.trim().split(/\s+/)
-    if (parts.length < 2) return false
-    const pid = parseInt(parts[1])
-    return idSet.has(pid)
-  }).map(p => {
-    if (typeof p === 'number') return p
-    return parseInt(p.trim().split(/\s+/)[1])
-  })
+      const inZonePrereqs = course.prereqs.filter(p => {
+        if (typeof p === 'number') return idSet.has(p)
+        const parts = p.trim().split(/\s+/)
+        if (parts.length < 2) return false
+        const pid = parseInt(parts[1])
+        return idSet.has(pid)
+      }).map(p => {
+        if (typeof p === 'number') return p
+        return parseInt(p.trim().split(/\s+/)[1])
+      })
 
-  if (inZonePrereqs.length === 0) { subcol[course.id] = 0; return 0 }
-  const max = Math.max(...inZonePrereqs.map(pid => {
-    const prereq = group.find(c => c.id === pid)
-    return prereq ? getSubcol(prereq) : 0
-  }))
-  subcol[course.id] = max + 1
-  return max + 1
-}
+      if (inZonePrereqs.length === 0) { subcol[course.id] = 0; return 0 }
+      const max = Math.max(...inZonePrereqs.map(pid => {
+        const prereq = group.find(c => c.id === pid)
+        return prereq ? getSubcol(prereq) : 0
+      }))
+      subcol[course.id] = max + 1
+      return max + 1
+    }
 
     group.forEach(c => getSubcol(c))
 
@@ -109,7 +111,6 @@ export function buildLayout(courses) {
     })
 
     Object.entries(bySubcol).forEach(([sc, subgroup]) => {
-      const colHeight = (subgroup.length - 1) * ROW_GAP
       const startY = 50
       subgroup.forEach((c, i) => {
         positioned[`${c.dept}-${c.id}`] = {
@@ -121,7 +122,6 @@ export function buildLayout(courses) {
 
     // Place ghost node for electives in this zone
     if (electivesByZone[zone]) {
-      // Find the bottom-most y in subcol 0 of this zone, place ghost below it
       const col0Courses = bySubcol[0] || []
       const col0Ys = col0Courses.map(c => positioned[`${c.dept}-${c.id}`]?.y ?? 0)
       const bottomY = col0Ys.length > 0 ? Math.max(...col0Ys) + ROW_GAP : 40
@@ -138,10 +138,17 @@ export function buildLayout(courses) {
     const maxSubcol = bySubcol && Object.keys(bySubcol).length > 0
       ? Math.max(...Object.keys(bySubcol).map(Number))
       : 0
+
+    // Record zone extents: startX is the left edge, endX is right edge of last subcol + node width
+    zoneExtents[zone] = {
+      startX: zoneX - NODE_WIDTH / 2,
+      endX: zoneX + maxSubcol * SUBCOL_GAP + NODE_WIDTH / 2,
+    }
+
     zoneX += ZONE_GAP + maxSubcol * SUBCOL_GAP
   })
 
-  return { layout: positioned, collapsedElectives }
+  return { layout: positioned, collapsedElectives, zoneExtents }
 }
 
 // Call once after buildLayout to register content bounds for clamping.
@@ -153,17 +160,14 @@ export function setContentBounds(bounds) {
 export function clampOffset(x, y, scale) {
   const vw = window.innerWidth
   const vh = window.innerHeight
-  const MARGIN = 120 // px of content that must stay visible on screen
+  const MARGIN = 120
 
   if (_contentBounds) {
-    // Content edges in screen space (before adding offset)
     const cLeft   = _contentBounds.minX * scale
     const cRight  = _contentBounds.maxX * scale
     const cTop    = _contentBounds.minY * scale
     const cBottom = _contentBounds.maxY * scale
 
-    // x + cRight >= MARGIN  => right edge of content stays at least MARGIN from left of screen
-    // x + cLeft  <= vw - MARGIN => left edge stays at least MARGIN from right of screen
     const minX = MARGIN - cRight
     const maxX = vw - MARGIN - cLeft
     const minY = MARGIN - cBottom
@@ -175,7 +179,6 @@ export function clampOffset(x, y, scale) {
     }
   }
 
-  // Fallback before bounds are registered
   const pad = 0.85
   return {
     x: Math.min(vw * 2, Math.max(-4000 * scale + vw * pad, x)),
