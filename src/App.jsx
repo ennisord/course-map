@@ -224,7 +224,7 @@ export default function App() {
                   y={LABEL_OFFSET_Y + 22}
                   textAnchor="middle"
                   fill="#666"
-                  fontSize={12}
+                  fontSize={14}
                   fontWeight={600}
                   letterSpacing="0.06em"
                 >
@@ -233,10 +233,10 @@ export default function App() {
                 {/* Subheader */}
                 <text
                   x={midX}
-                  y={LABEL_OFFSET_Y + 8}
+                  y={LABEL_OFFSET_Y + 2}
                   textAnchor="middle"
                   fill="#3a3a3a"
-                  fontSize={10}
+                  fontSize={16}
                   fontWeight={400}
                   letterSpacing="0.03em"
                 >
