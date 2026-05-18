@@ -45,9 +45,10 @@ export default function SearchPopup({ courses, onSelectCourse, onClose }) {
         onWheel={e => e.stopPropagation()}
         style={{
           position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
+          position: 'fixed',
+            top: '12%',
+            left: '50%',
+            transform: 'translateX(-50%)',
           width: 'min(540px, calc(100vw - 48px))',
           maxHeight: 'min(520px, calc(100vh - 80px))',
           zIndex: 1000,
