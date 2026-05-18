@@ -227,12 +227,12 @@ export default function SearchPopup({ courses, onSelectCourse, onClose }) {
                         key={prereqKey ?? label}
                         style={{
                           background: '#181818',
-                          border: '1px solid #2e2e2e',
+                          border: '1px solid #5a5a5a',
                           borderRadius: 999,
                           padding: '2px 8px',
                           fontSize: 11,
                           fontWeight: 600,
-                          color: '#555',
+                          color: '#848484',
                           letterSpacing: '0.03em',
                           lineHeight: 1.6,
                         }}

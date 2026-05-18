@@ -152,12 +152,12 @@ export default function ElectivePopup({ courses, onSelectCourse, onClose, select
                         key={prereqKey ?? label}
                         style={{
                           background: '#181818',
-                          border: '1px solid #4a4a4a',
+                          border: '1px solid #5a5a5a',
                           borderRadius: 999,
                           padding: '1px 7px',
                           fontSize: 10,
                           fontWeight: 600,
-                          color: '#727272',
+                          color: '#848484',
                           letterSpacing: '0.03em',
                           lineHeight: 1.6,
                         }}

@@ -61,7 +61,8 @@ export default function Legend({ onZoomIn, onZoomOut, onOpenWishlist, onOpenComp
         @media (max-width: 640px) {
           .legend-wrap {
             left: auto;
-            right: 16px;
+            right: 10px;
+            bottom: 14px;
             align-items: flex-end;
           }
         }
@@ -83,7 +84,7 @@ export default function Legend({ onZoomIn, onZoomOut, onOpenWishlist, onOpenComp
           </svg>
         </button>
 
-        {/* Wishlist 
+        {/* Wishlist
         <button
           style={iconBtnStyle}
           onMouseEnter={iconHover}
@@ -184,6 +185,22 @@ export default function Legend({ onZoomIn, onZoomOut, onOpenWishlist, onOpenComp
         >
           Honours requirement
         </span>
+
+        {/* Fine print */}
+        <div style={{ marginTop: 3, display: 'flex', alignItems: 'center', gap: 5, pointerEvents: 'auto' }}>
+          <span style={{ fontSize: 12, color: '#747474', letterSpacing: '0.02em', whiteSpace: 'nowrap' }}>© 2025 Ennis</span>
+          <span style={{ fontSize: 12, color: '#747474' }}>·</span>
+          <a
+            href="https://github.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ fontSize: 12, color: '#848484', textDecoration: 'none', letterSpacing: '0.02em', transition: 'color 0.15s', whiteSpace: 'nowrap' }}
+            onMouseEnter={e => e.currentTarget.style.color = '#969696'}
+            onMouseLeave={e => e.currentTarget.style.color = '#747474'}
+          >
+            GitHub
+          </a>
+        </div>
 
       </div>
     </>
