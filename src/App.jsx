@@ -14,8 +14,10 @@ const ZONE_LABELS = {
   1: { title: '100-level', sub: 'Foundations' },
   2: { title: '200-level', sub: 'Core methods' },
   3: { title: '300-level', sub: 'Intermediate theory' },
-  4: { title: '400-level', sub: 'Advanced topics' },
-  5: { title: '500-level', sub: 'Graduate / honours' },
+  4: { title: '400-level', sub: 'Upper-intermediate topics' },
+  5: { title: '500-level', sub: 'Advanced topics' },
+  6: { title: '600-level', sub: '' },
+  7: { title: '700-level', sub: '' },
 }
 
 // How far above the node layer (y=50) the bracket sits.
