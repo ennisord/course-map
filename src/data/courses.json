@@ -1164,14 +1164,5 @@
       791
     ],
     "tags": []
-  },
-  {
-    "id": 209,
-    "dept": "ENGG",
-    "name": "(ECON 209) Engineering Economics",
-    "year": 1,
-    "desc": "The basic tools and methodology of engineering economic studies. Topics include investment decisions, theory of replacement, economies of scale, externalities, social decision making and government regulation. Examples are drawn from engineering projects.",
-    "prereqs": [],
-    "tags": []
   }
 ]
