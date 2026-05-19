@@ -58,13 +58,7 @@ export default function Legend({ onZoomIn, onZoomOut, onOpenWishlist, onOpenComp
           gap: 6px;
           align-items: flex-start;
         }
-        @media (max-width: 640px) {
-          .legend-wrap {
-            left: auto;
-            right: 10px;
-            bottom: 14px;
-            align-items: flex-end;
-          }
+        
         }
       `}</style>
       <div className="legend-wrap">
@@ -201,7 +195,6 @@ export default function Legend({ onZoomIn, onZoomOut, onOpenWishlist, onOpenComp
             View on GitHub
           </a>
         </div>
-
       </div>
     </>
   )
