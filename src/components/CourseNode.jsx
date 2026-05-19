@@ -1,5 +1,8 @@
 import { useState } from 'react'
-import { getColor, getGlow, resolvePrereq } from '../utils/courseUtils'
+import { getColor, getGlow, getCourseKey, resolvePrereq } from '../utils/courseUtils'
+
+// Colour of the "/" separator between OR-group options
+const OR_SLASH_COLOR = '#333'
 
 export default function CourseNode({ course, pos, selected, onDragStart, onClick, courses, onSelectCourse }) {
   const [completed, setCompleted] = useState(false)
@@ -15,48 +18,50 @@ export default function CourseNode({ course, pos, selected, onDragStart, onClick
       : getGlow(course.tags)
     : 'none'
 
+  // Display label: "MATH 249 / 265 / 275" for multi-id, normal otherwise
+  const ids = Array.isArray(course.id) ? course.id : [course.id]
+  const courseLabel = ids.length > 1
+    ? `${course.dept} ${ids[0]}`
+    : `${course.dept} ${course.id}`
+  const extraIds = ids.slice(1) // [265, 275] if multi-id
+
   const prereqBlobs = course.prereqs.map(prereq => {
     const key = resolvePrereq(prereq, courses)
-    const prereqCourse = key ? courses.find(c => `${c.dept}-${c.id}` === key) : null
+    const prereqCourse = key ? courses.find(c => getCourseKey(c) === key) : null
     let label
     if (prereqCourse) {
       label = prereqCourse.dept === 'ECON'
-        ? String(prereqCourse.id)
-        : `${prereqCourse.dept} ${prereqCourse.id}`
+        ? String(Array.isArray(prereqCourse.id) ? prereqCourse.id[0] : prereqCourse.id)
+        : `${prereqCourse.dept} ${Array.isArray(prereqCourse.id) ? prereqCourse.id[0] : prereqCourse.id}`
     } else {
       label = typeof prereq === 'number' ? String(prereq) : prereq
     }
     return { key, label, prereqCourse }
   })
 
-  // Card height is fixed ~68px. Blobs are absolutely positioned below so they
-  // don't affect the outer div height, keeping -translate-y-1/2 centering correct
-  // for bezier curve endpoints.
   const CARD_HEIGHT = 68
 
   return (
     <div
       className="absolute select-none w-44 -translate-x-1/2 -translate-y-1/2"
-      style={{
-        left: pos.x,
-        top: pos.y,
-        fontFamily: "'League Spartan', sans-serif",
-        height: CARD_HEIGHT,
-      }}
+      style={{ left: pos.x, top: pos.y, fontFamily: "'League Spartan', sans-serif", height: CARD_HEIGHT }}
     >
-      {/* Main card */}
       <div
         className="rounded-lg bg-[#1a1a1a] px-3 py-2 cursor-pointer h-full"
-        style={{
-          border: `1px solid ${border}`,
-          boxShadow: glow,
-        }}
+        style={{ border: `1px solid ${border}`, boxShadow: glow }}
         onMouseDown={e => { e.stopPropagation(); onDragStart(e) }}
         onTouchStart={e => { e.stopPropagation(); onDragStart(e) }}
         onClick={onClick}
       >
+        {/* Course id line — shows "MATH 249 / 265 / 275" for multi-id */}
         <div className="text-[13px] font-bold tracking-wide truncate" style={{ color: text }}>
-          {course.dept} {course.id}
+          {courseLabel}
+          {extraIds.map((xid, i) => (
+            <span key={xid}>
+              <span style={{ color: OR_SLASH_COLOR, fontWeight: 700 }}> / </span>
+              <span>{xid}</span>
+            </span>
+          ))}
         </div>
         <div className="text-[11px] font-normal truncate" style={{ color: muted }}>
           {course.name}
@@ -96,7 +101,6 @@ export default function CourseNode({ course, pos, selected, onDragStart, onClick
         </div>
       </div>
 
-      {/* Prereq blobs — absolutely positioned below card, don't affect outer div height */}
       {prereqBlobs.length > 0 && (
         <div
           className="flex flex-wrap gap-1 px-1"
@@ -107,11 +111,8 @@ export default function CourseNode({ course, pos, selected, onDragStart, onClick
               key={key ?? label}
               onMouseDown={e => e.stopPropagation()}
               onTouchStart={e => e.stopPropagation()}
-              onClick={e => {
-                e.stopPropagation()
-                if (key && onSelectCourse) onSelectCourse(key)
-              }}
-              title={prereqCourse ? `${prereqCourse.dept} ${prereqCourse.id} — ${prereqCourse.name}` : label}
+              onClick={e => { e.stopPropagation(); if (key && onSelectCourse) onSelectCourse(key) }}
+              title={prereqCourse ? `${prereqCourse.dept} ${Array.isArray(prereqCourse.id) ? prereqCourse.id.join('/') : prereqCourse.id} — ${prereqCourse.name}` : label}
               style={{
                 background: '#1e1e1e',
                 border: '1px solid #2e2e2e',
@@ -126,15 +127,8 @@ export default function CourseNode({ course, pos, selected, onDragStart, onClick
                 transition: 'border-color 0.15s, color 0.15s',
                 lineHeight: 1.6,
               }}
-              onMouseEnter={e => {
-                if (!key) return
-                e.currentTarget.style.borderColor = '#555'
-                e.currentTarget.style.color = '#999'
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.borderColor = '#2e2e2e'
-                e.currentTarget.style.color = '#555'
-              }}
+              onMouseEnter={e => { if (!key) return; e.currentTarget.style.borderColor = '#555'; e.currentTarget.style.color = '#999' }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = '#2e2e2e'; e.currentTarget.style.color = '#555' }}
             >
               {label}
             </button>

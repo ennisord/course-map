@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react'
 import courses from './data/courses.json'
-import { buildLayout, getBezier, getColor, resolvePrereq, clampOffset, setContentBounds } from './utils/courseUtils'
+import { buildLayout, getBezier, getColor, getCourseKey, resolvePrereq, clampOffset, setContentBounds } from './utils/courseUtils'
 import CourseNode from './components/CourseNode'
 import Legend from './components/Legend'
 import LoadingScreen from './components/LoadingScreen'
@@ -8,10 +8,8 @@ import CourseDetailPanel from './components/CourseDetailPanel'
 import ElectivePopup from './components/ElectivePopup'
 import SearchPopup from './components/SearchPopup'
 
-
 const WORD = 'Course Map'
 
-// Edit these subheaders to match your department's language
 const ZONE_LABELS = {
   1: { title: '100-level', sub: 'Foundations' },
   2: { title: '200-level', sub: 'Core methods' },
@@ -22,8 +20,6 @@ const ZONE_LABELS = {
   7: { title: '700-level', sub: '' },
 }
 
-// How far above the node layer (y=50) the bracket sits.
-// Increase this value for more breathing room.
 const LABEL_OFFSET_Y = -80
 
 export default function App() {
@@ -38,9 +34,7 @@ export default function App() {
   const didDragRef = useRef(false)
   const [searchOpen, setSearchOpen] = useState(false)
 
-
   const { layout, collapsedElectives, zoneExtents } = buildLayout(courses)
-  const getKey = (course) => `${course.dept}-${course.id}`
 
   const allPositions = Object.values(layout)
   if (allPositions.length > 0) {
@@ -53,7 +47,7 @@ export default function App() {
   }
 
   const selectedCourse = selectedId
-    ? courses.find(c => getKey(c) === selectedId) ?? null
+    ? courses.find(c => getCourseKey(c) === selectedId) ?? null
     : null
 
   useEffect(() => {
@@ -81,7 +75,7 @@ export default function App() {
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const connectedIds = selectedId ? (() => {
-    const selected = courses.find(c => getKey(c) === selectedId)
+    const selected = courses.find(c => getCourseKey(c) === selectedId)
     if (!selected) return new Set()
     const ids = new Set()
     selected.prereqs.forEach(prereq => {
@@ -89,13 +83,9 @@ export default function App() {
       if (key) ids.add(key)
     })
     courses.forEach(c => {
-      if (c.prereqs.some(p => {
-        if (typeof p === 'number') {
-          const sel = courses.find(x => getKey(x) === selectedId)
-          return sel && p === sel.id
-        }
-        return resolvePrereq(p, courses) === selectedId
-      })) ids.add(getKey(c))
+      if (c.prereqs.some(p => resolvePrereq(p, courses) === selectedId)) {
+        ids.add(getCourseKey(c))
+      }
     })
     return ids
   })() : new Set()
@@ -179,7 +169,6 @@ export default function App() {
 
   const popupElectives = popup ? collapsedElectives[popup.ghostKey] : null
 
-  // Bracket geometry constants
   const BRACKET_TICK = 8
   const BRACKET_RADIUS = 4
   const bracketY = LABEL_OFFSET_Y + 36
@@ -201,8 +190,6 @@ export default function App() {
         top: 0,
         left: 0,
       }}>
-
-        {/* Zone overbrace labels */}
         <svg
           className="absolute top-0 left-0 overflow-visible pointer-events-none"
           style={{ width: 4000, height: 4000 }}
@@ -213,39 +200,16 @@ export default function App() {
             const midX = (startX + endX) / 2
             const r = BRACKET_RADIUS
             const tick = BRACKET_TICK
-
             return (
               <g key={zone} style={{ fontFamily: "'League Spartan', sans-serif" }}>
-                {/* Rectangular overbrace: left tick → rounded corner → bar → rounded corner → right tick */}
                 <path
                   d={`M ${startX} ${bracketY + tick} L ${startX} ${bracketY + r} Q ${startX} ${bracketY} ${startX + r} ${bracketY} L ${endX - r} ${bracketY} Q ${endX} ${bracketY} ${endX} ${bracketY + r} L ${endX} ${bracketY + tick}`}
-                  fill="none"
-                  stroke="#2e2e2e"
-                  strokeWidth={1.5}
-                  strokeLinecap="round"
+                  fill="none" stroke="#2e2e2e" strokeWidth={1.5} strokeLinecap="round"
                 />
-                {/* Level title e.g. "100-level" */}
-                <text
-                  x={midX}
-                  y={LABEL_OFFSET_Y + 22}
-                  textAnchor="middle"
-                  fill="#666"
-                  fontSize={14}
-                  fontWeight={600}
-                  letterSpacing="0.06em"
-                >
+                <text x={midX} y={LABEL_OFFSET_Y + 22} textAnchor="middle" fill="#666" fontSize={14} fontWeight={600} letterSpacing="0.06em">
                   {label.title.toUpperCase()}
                 </text>
-                {/* Subheader */}
-                <text
-                  x={midX}
-                  y={LABEL_OFFSET_Y + 2}
-                  textAnchor="middle"
-                  fill="#3a3a3a"
-                  fontSize={16}
-                  fontWeight={400}
-                  letterSpacing="0.03em"
-                >
+                <text x={midX} y={LABEL_OFFSET_Y + 2} textAnchor="middle" fill="#3a3a3a" fontSize={16} fontWeight={400} letterSpacing="0.03em">
                   {label.sub}
                 </text>
               </g>
@@ -253,10 +217,9 @@ export default function App() {
           })}
         </svg>
 
-        {/* Bezier curves — only for selected and connected nodes */}
         <svg className="absolute top-0 left-0 overflow-visible pointer-events-none" style={{ width: 4000, height: 4000 }}>
           {courses.map(course => {
-            const key = getKey(course)
+            const key = getCourseKey(course)
             const from = layout[key]
             if (!from) return null
             if (selectedId !== key) return null
@@ -270,21 +233,17 @@ export default function App() {
                 <path
                   key={`${key}-${i}`}
                   d={getBezier(to.x, to.y, from.x, from.y)}
-                  stroke={border}
-                  strokeWidth={2}
-                  fill="none"
-                  opacity={0.85}
+                  stroke={border} strokeWidth={2} fill="none" opacity={0.85}
                 />
               )
             })
           })}
         </svg>
 
-        {/* Regular course nodes */}
         {courses
           .filter(c => c.tags.length > 0)
           .map(course => {
-            const key = getKey(course)
+            const key = getCourseKey(course)
             const pos = layout[key]
             const selected = selectedId === key || connectedIds.has(key)
             return (
@@ -307,7 +266,6 @@ export default function App() {
             )
           })}
 
-        {/* Ghost nodes for collapsed electives */}
         {Object.entries(collapsedElectives).map(([ghostKey, { courses: electives, x, y }]) => {
           const isOpen = popup?.ghostKey === ghostKey
           return (
@@ -315,12 +273,7 @@ export default function App() {
               key={ghostKey}
               data-ghost="true"
               className="absolute select-none -translate-x-1/2 -translate-y-1/2 cursor-pointer"
-              style={{
-                left: x,
-                top: y,
-                width: 176,
-                fontFamily: "'League Spartan', sans-serif",
-              }}
+              style={{ left: x, top: y, width: 176, fontFamily: "'League Spartan', sans-serif" }}
               onMouseDown={e => { e.stopPropagation(); beginDrag(e.clientX, e.clientY) }}
               onTouchStart={e => { e.stopPropagation(); beginDrag(e.touches[0].clientX, e.touches[0].clientY) }}
               onClick={() => handleGhostClick(ghostKey)}
@@ -328,11 +281,8 @@ export default function App() {
               <div style={{
                 background: isOpen ? '#1e1e1e' : '#161616',
                 border: `1px dashed ${isOpen ? '#555' : '#333'}`,
-                borderRadius: 10,
-                padding: '7px 12px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
+                borderRadius: 10, padding: '7px 12px',
+                display: 'flex', alignItems: 'center', gap: 8,
                 transition: 'border-color 0.15s, background 0.15s',
               }}>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={isOpen ? '#888' : '#444'} strokeWidth="2" strokeLinecap="round" style={{ flexShrink: 0, transition: 'stroke 0.15s' }}>
@@ -343,9 +293,7 @@ export default function App() {
                   <div style={{ color: isOpen ? '#aaa' : '#666', fontSize: 11, fontWeight: 600, letterSpacing: '0.03em', transition: 'color 0.15s' }}>
                     {electives.length} elective{electives.length !== 1 ? 's' : ''}
                   </div>
-                  <div style={{ color: '#3a3a3a', fontSize: 10, marginTop: 1 }}>
-                    click to browse
-                  </div>
+                  <div style={{ color: '#3a3a3a', fontSize: 10, marginTop: 1 }}>click to browse</div>
                 </div>
                 <svg
                   width="10" height="10" viewBox="0 0 24 24" fill="none"
@@ -360,13 +308,12 @@ export default function App() {
         })}
       </div>
 
-      {/* Elective popup — outside the panning layer, fixed position */}
       {popup && popupElectives && (
         <ElectivePopup
           courses={popupElectives.courses}
           allCourses={courses}
           selectedId={selectedId}
-          onSelectCourse={(course) => setSelectedId(getKey(course))}
+          onSelectCourse={(course) => setSelectedId(getCourseKey(course))}
           onClose={() => setPopup(null)}
         />
       )}
@@ -374,12 +321,11 @@ export default function App() {
       {searchOpen && (
         <SearchPopup
           courses={courses}
-          onSelectCourse={(course) => { setSelectedId(getKey(course)); setSearchOpen(false) }}
+          onSelectCourse={(course) => { setSelectedId(getCourseKey(course)); setSearchOpen(false) }}
           onClose={() => setSearchOpen(false)}
         />
       )}
 
-      {/* Course detail panel */}
       <CourseDetailPanel
         course={selectedCourse}
         courses={courses}

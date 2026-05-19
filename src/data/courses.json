@@ -17,7 +17,7 @@
     "tags": ["core"]
   },
   {
-    "id": 249,
+    "id": [249, 265, 275],
     "dept": "MATH",
     "name": "Calculus I",
     "year": 1,
