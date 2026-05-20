@@ -107,7 +107,7 @@ export default function CourseNode({ course, pos, selected, onDragStart, onClick
               Completed
             </span>
           </button>
-
+          {/*
           <button
             title="Wishlist"
             className="group relative p-0 bg-transparent border-none cursor-pointer"
@@ -122,6 +122,7 @@ export default function CourseNode({ course, pos, selected, onDragStart, onClick
               Wishlist
             </span>
           </button>
+          */}
         </div>
       </div>
 
