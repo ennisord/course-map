@@ -330,6 +330,8 @@ export default function App() {
         course={selectedCourse}
         courses={courses}
         onClose={() => setSelectedId(null)}
+        onSelectCourse={(key) => setSelectedId(key)}
+
       />
 
       <Legend

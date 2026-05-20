@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { getColor, getGlow, getCourseKey, resolvePrereq } from '../utils/courseUtils'
 
-// Colour of the "/" separator between OR-group options
+// Colour of the "/" separator in merged blobs
 const OR_SLASH_COLOR = '#333'
 
 export default function CourseNode({ course, pos, selected, onDragStart, onClick, courses, onSelectCourse }) {
@@ -18,25 +18,66 @@ export default function CourseNode({ course, pos, selected, onDragStart, onClick
       : getGlow(course.tags)
     : 'none'
 
-  // Display label: "MATH 249 / 265 / 275" for multi-id, normal otherwise
+  // Display label for the node header
   const ids = Array.isArray(course.id) ? course.id : [course.id]
-  const courseLabel = ids.length > 1
-    ? `${course.dept} ${ids[0]}`
-    : `${course.dept} ${course.id}`
-  const extraIds = ids.slice(1) // [265, 275] if multi-id
+  const courseLabel = `${course.dept} ${ids[0]}`
+  const extraIds = ids.slice(1)
 
-  const prereqBlobs = course.prereqs.map(prereq => {
+  // Build prereq blobs, collapsing multiple prereqs that resolve to the same
+  // node into a single blob showing all the original ids (e.g. 249 / 265 / 275)
+  const blobMap = new Map() // key -> { resolvedCourse, labels: [] }
+  course.prereqs.forEach(prereq => {
     const key = resolvePrereq(prereq, courses)
-    const prereqCourse = key ? courses.find(c => getCourseKey(c) === key) : null
-    let label
-    if (prereqCourse) {
-      label = prereqCourse.dept === 'ECON'
-        ? String(Array.isArray(prereqCourse.id) ? prereqCourse.id[0] : prereqCourse.id)
-        : `${prereqCourse.dept} ${Array.isArray(prereqCourse.id) ? prereqCourse.id[0] : prereqCourse.id}`
+    const resolvedCourse = key ? courses.find(c => getCourseKey(c) === key) : null
+
+    // Raw label for this prereq entry
+    const rawLabel = typeof prereq === 'number'
+      ? String(prereq)
+      : prereq.trim().split(/\s+/).slice(1).join(' ') || prereq // just the numeric part e.g. "265"
+
+    if (key) {
+      if (!blobMap.has(key)) {
+        blobMap.set(key, { key, resolvedCourse, dept: resolvedCourse?.dept ?? null, labels: [] })
+      }
+      blobMap.get(key).labels.push(rawLabel)
     } else {
-      label = typeof prereq === 'number' ? String(prereq) : prereq
+      // Unresolved prereq — show as-is, unique key by label
+      const fallbackKey = `unresolved-${prereq}`
+      if (!blobMap.has(fallbackKey)) {
+        blobMap.set(fallbackKey, { key: null, resolvedCourse: null, dept: null, labels: [rawLabel] })
+      }
     }
-    return { key, label, prereqCourse }
+  })
+
+  const prereqBlobs = Array.from(blobMap.values()).map(({ key, resolvedCourse, dept, labels }) => {
+    // If multiple labels collapsed into one blob, build "249 / 265 / 275"
+    // Prefix dept only on the first label if it's a cross-dept course
+    let parts
+    if (labels.length > 1) {
+      // All from same dept node — show dept once then numbers
+      const firstIsDeptPrefixed = resolvedCourse && resolvedCourse.dept !== 'ECON'
+      parts = labels.map((l, i) => {
+        // Strip any dept prefix from label since we'll add it on first
+        const numeric = l.replace(/^[A-Z]+ /, '')
+        if (i === 0 && firstIsDeptPrefixed) return `${resolvedCourse.dept} ${numeric}`
+        return numeric
+      })
+    } else {
+      // Single prereq — original display logic
+      if (resolvedCourse) {
+        parts = [resolvedCourse.dept === 'ECON'
+          ? String(Array.isArray(resolvedCourse.id) ? resolvedCourse.id[0] : resolvedCourse.id)
+          : `${resolvedCourse.dept} ${Array.isArray(resolvedCourse.id) ? resolvedCourse.id[0] : resolvedCourse.id}`]
+      } else {
+        parts = [labels[0]]
+      }
+    }
+
+    const title = resolvedCourse
+      ? `${resolvedCourse.dept} ${Array.isArray(resolvedCourse.id) ? resolvedCourse.id.join('/') : resolvedCourse.id} — ${resolvedCourse.name}`
+      : parts.join(' / ')
+
+    return { key, parts, title }
   })
 
   const CARD_HEIGHT = 68
@@ -53,10 +94,9 @@ export default function CourseNode({ course, pos, selected, onDragStart, onClick
         onTouchStart={e => { e.stopPropagation(); onDragStart(e) }}
         onClick={onClick}
       >
-        {/* Course id line — shows "MATH 249 / 265 / 275" for multi-id */}
         <div className="text-[13px] font-bold tracking-wide truncate" style={{ color: text }}>
           {courseLabel}
-          {extraIds.map((xid, i) => (
+          {extraIds.map((xid) => (
             <span key={xid}>
               <span style={{ color: OR_SLASH_COLOR, fontWeight: 700 }}> / </span>
               <span>{xid}</span>
@@ -106,13 +146,13 @@ export default function CourseNode({ course, pos, selected, onDragStart, onClick
           className="flex flex-wrap gap-1 px-1"
           style={{ position: 'absolute', top: CARD_HEIGHT + 6, left: 0, width: '100%' }}
         >
-          {prereqBlobs.map(({ key, label, prereqCourse }) => (
+          {prereqBlobs.map(({ key, parts, title }) => (
             <button
-              key={key ?? label}
+              key={key ?? parts.join('/')}
               onMouseDown={e => e.stopPropagation()}
               onTouchStart={e => e.stopPropagation()}
               onClick={e => { e.stopPropagation(); if (key && onSelectCourse) onSelectCourse(key) }}
-              title={prereqCourse ? `${prereqCourse.dept} ${Array.isArray(prereqCourse.id) ? prereqCourse.id.join('/') : prereqCourse.id} — ${prereqCourse.name}` : label}
+              title={title}
               style={{
                 background: '#1e1e1e',
                 border: '1px solid #2e2e2e',
@@ -130,7 +170,12 @@ export default function CourseNode({ course, pos, selected, onDragStart, onClick
               onMouseEnter={e => { if (!key) return; e.currentTarget.style.borderColor = '#555'; e.currentTarget.style.color = '#999' }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = '#2e2e2e'; e.currentTarget.style.color = '#555' }}
             >
-              {label}
+              {parts.map((p, i) => (
+                <span key={i}>
+                  {i > 0 && <span style={{ color: OR_SLASH_COLOR, margin: '0 2px' }}>/</span>}
+                  {p}
+                </span>
+              ))}
             </button>
           ))}
         </div>
