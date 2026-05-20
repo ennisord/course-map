@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getColor, getCourseKey, resolvePrereq } from '../utils/courseUtils'
 
-export default function CourseDetailPanel({ course, courses, onClose, onSelectCourse }) {
+export default function CourseDetailPanel({ course, courses, onClose, onSelectCourse, completedIds, onToggleCompleted }) {
   const [visible, setVisible] = useState(false)
   const [displayed, setDisplayed] = useState(course)
 
@@ -19,18 +19,21 @@ export default function CourseDetailPanel({ course, courses, onClose, onSelectCo
   if (!displayed) return null
 
   const { border, text, muted } = getColor(displayed.tags)
+  const key = getCourseKey(displayed)
+  const isCompleted = completedIds?.has(key) ?? false
 
   const ids = Array.isArray(displayed.id) ? displayed.id : [displayed.id]
   const idLabel = ids.join(' / ')
 
+  // Deduplicate prereqs resolving to same node
   const blobMap = new Map()
   ;(displayed.prereqs || []).forEach(p => {
-    const key = resolvePrereq(p, courses)
-    const found = key ? courses.find(c => getCourseKey(c) === key) : null
-    if (key) {
-      if (!blobMap.has(key)) blobMap.set(key, { found, rawLabels: [] })
+    const prereqKey = resolvePrereq(p, courses)
+    const found = prereqKey ? courses.find(c => getCourseKey(c) === prereqKey) : null
+    if (prereqKey) {
+      if (!blobMap.has(prereqKey)) blobMap.set(prereqKey, { found, rawLabels: [] })
       const numeric = typeof p === 'number' ? String(p) : p.trim().split(/\s+/).slice(1).join(' ') || p
-      blobMap.get(key).rawLabels.push(numeric)
+      blobMap.get(prereqKey).rawLabels.push(numeric)
     } else {
       const label = typeof p === 'string' ? p : String(p)
       const fk = `unresolved-${label}`
@@ -38,12 +41,19 @@ export default function CourseDetailPanel({ course, courses, onClose, onSelectCo
     }
   })
 
-  const prereqNames = Array.from(blobMap.values()).map(({ found, rawLabels }) => {
-    if (!found) return rawLabels[0]
-    const foundIds = Array.isArray(found.id) ? found.id : [found.id]
-    if (rawLabels.length > 1) return `${found.dept} ${rawLabels.join(' / ')}, ${found.name}`
-    return `${found.dept} ${foundIds[0]}, ${found.name}`
+  const prereqEntries = Array.from(blobMap.entries()).map(([prereqKey, { found, rawLabels }]) => {
+    const prereqCompleted = !prereqKey.startsWith('unresolved-') && (completedIds?.has(prereqKey) ?? false)
+    const foundIds = found ? (Array.isArray(found.id) ? found.id : [found.id]) : []
+    let name
+    if (!found) name = rawLabels[0]
+    else if (rawLabels.length > 1) name = `${found.dept} ${rawLabels.join(' / ')}, ${found.name}`
+    else name = `${found.dept} ${foundIds[0]}, ${found.name}`
+    return { prereqKey, name, prereqCompleted, clickable: !prereqKey.startsWith('unresolved-') }
   })
+
+  const hasPrereqs = prereqEntries.length > 0
+  const allPrereqsDone = hasPrereqs && prereqEntries.every(e => e.prereqCompleted)
+  const canTake = allPrereqsDone && !isCompleted
 
   return (
     <>
@@ -75,24 +85,26 @@ export default function CourseDetailPanel({ course, courses, onClose, onSelectCo
         }}
         className="course-panel"
       >
-        {/* Inner wrapper gives content a true constrained width so truncation works */}
         <div style={{ padding: '24px 22px 32px', overflow: 'hidden', boxSizing: 'border-box', width: '100%' }}>
 
-          <button
-            onClick={onClose}
-            style={{
-              position: 'absolute', top: 14, right: 16,
-              background: 'none', border: 'none', cursor: 'pointer',
-              color: '#555', lineHeight: 1, padding: 0, fontSize: 18,
-              transition: 'color 0.15s',
-            }}
-            onMouseEnter={e => (e.currentTarget.style.color = text)}
-            onMouseLeave={e => (e.currentTarget.style.color = '#555')}
-            aria-label="Close"
-          >
-            ✕
-          </button>
+          {/* Close + thumbs up */}
+          <div style={{ position: 'absolute', top: 14, right: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <button
+              onClick={onClose}
+              style={{
+                background: 'none', border: 'none', cursor: 'pointer',
+                color: '#555', lineHeight: 1, padding: 0, fontSize: 18,
+                transition: 'color 0.15s',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.color = text)}
+              onMouseLeave={e => (e.currentTarget.style.color = '#555')}
+              aria-label="Close"
+            >
+              ✕
+            </button>
+          </div>
 
+          {/* Course id + name */}
           <div style={{ marginBottom: 20 }}>
             <div style={{ fontSize: 11, letterSpacing: '0.12em', color: muted, textTransform: 'uppercase', marginBottom: 4 }}>
               {displayed.dept}
@@ -118,58 +130,106 @@ export default function CourseDetailPanel({ course, courses, onClose, onSelectCo
 
           <Divider color={border} />
 
-          {displayed.desc ? (
-            <Section label="Description">
-              <p style={{ fontSize: 13, color: '#aaa', lineHeight: 1.7, margin: 0 }}>{displayed.desc}</p>
-            </Section>
-          ) : (
-            <Section label="Description">
-              <p style={{ fontSize: 13, color: '#444', fontStyle: 'italic', margin: 0 }}>No description available.</p>
-            </Section>
-          )}
+          <Section label="Description">
+  {displayed.desc
+    ? <p style={{ fontSize: 13, color: '#aaa', lineHeight: 1.7, margin: 0 }}>{displayed.desc}</p>
+    : <p style={{ fontSize: 13, color: '#444', fontStyle: 'italic', margin: 0 }}>No description available.</p>
+  }
+  {canTake && (
+    <p style={{ fontSize: 12, color: '#60a5fa', margin: '10px 0 0', letterSpacing: '0.02em' }}>
+      ✓ You can take this course.
+    </p>
+  )}
+</Section>
+
+<Divider color={border} />
+
+<Section label="Completion">
+  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+    <button
+      onClick={() => onToggleCompleted(key)}
+      style={{
+        background: isCompleted ? '#0f2033' : '#1a1a1a',
+        border: `1px solid ${isCompleted ? '#1a3a5c' : '#2e2e2e'}`,
+        borderRadius: 8,
+        cursor: 'pointer',
+        padding: '6px 8px',
+        display: 'flex',
+        alignItems: 'center',
+        flexShrink: 0,
+        transition: 'background 0.15s, border-color 0.15s',
+      }}
+      onMouseEnter={e => {
+        e.currentTarget.style.borderColor = isCompleted ? '#2a5a8c' : '#555'
+      }}
+      onMouseLeave={e => {
+        e.currentTarget.style.borderColor = isCompleted ? '#1a3a5c' : '#2e2e2e'
+      }}
+    >
+      <svg width="14" height="14" viewBox="0 0 24 24"
+        fill={isCompleted ? '#60a5fa' : 'none'}
+        stroke={isCompleted ? '#60a5fa' : '#555'}
+        strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      >
+        <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/>
+        <path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
+      </svg>
+    </button>
+    <span style={{ fontSize: 13, color: isCompleted ? '#60a5fa' : '#444', transition: 'color 0.15s' }}>
+      {isCompleted ? 'I have completed this course.' : 'I haven\'t completed this course.'}
+    </span>
+  </div>
+</Section>
 
           <Divider color={border} />
 
           <Section label="Prerequisites">
-            {prereqNames.length === 0 ? (
+            {prereqEntries.length === 0 ? (
               <p style={{ fontSize: 13, color: '#444', fontStyle: 'italic', margin: 0 }}>None</p>
             ) : (
-              <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {prereqNames.map((name, i) => {
-                  const key = Array.from(blobMap.keys())[i]
-                  const clickable = key && !key.startsWith('unresolved-')
-                  return (
-                    <li
-                      key={i}
-                      onClick={() => clickable && onSelectCourse(key)}
-                      style={{
-                        display: 'flex', alignItems: 'center', gap: 8,
-                        cursor: clickable ? 'pointer' : 'default',
-                        padding: '6px 8px',
-                        borderRadius: 6,
-                        border: '1px solid transparent',
-                        transition: 'border-color 0.15s, background 0.15s',
-                      }}
-                      onMouseEnter={e => {
-                        if (!clickable) return
-                        e.currentTarget.style.borderColor = border
-                        e.currentTarget.style.background = `${border}11`
-                      }}
-                      onMouseLeave={e => {
-                        e.currentTarget.style.borderColor = 'transparent'
-                        e.currentTarget.style.background = 'transparent'
-                      }}
-                    >
-                      <span style={{ width: 6, height: 6, borderRadius: '50%', background: clickable ? border : '#333', flexShrink: 0 }} />
-                      <span style={{ fontSize: 13, color: clickable ? '#aaa' : '#444', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{name}</span>
-                      {clickable && (
-                        <svg style={{ marginLeft: 'auto', flexShrink: 0 }} width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth="2.5" strokeLinecap="round">
-                          <polyline points="9 18 15 12 9 6"/>
-                        </svg>
-                      )}
-                    </li>
-                  )
-                })}
+              <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 4 }}>
+                {prereqEntries.map(({ prereqKey, name, prereqCompleted, clickable }, i) => (
+                  <li
+                    key={i}
+                    onClick={() => clickable && onSelectCourse(prereqKey)}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 8,
+                      cursor: clickable ? 'pointer' : 'default',
+                      padding: '6px 8px',
+                      borderRadius: 6,
+                      border: `1px solid ${prereqCompleted ? '#1a3a5c' : 'transparent'}`,
+                      background: prereqCompleted ? '#0a1520' : 'transparent',
+                      transition: 'border-color 0.15s, background 0.15s',
+                    }}
+                    onMouseEnter={e => {
+                      if (!clickable) return
+                      e.currentTarget.style.borderColor = prereqCompleted ? '#2a5a8c' : border
+                      e.currentTarget.style.background = prereqCompleted ? '#0f1a24' : `${border}11`
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.borderColor = prereqCompleted ? '#1a3a5c' : 'transparent'
+                      e.currentTarget.style.background = prereqCompleted ? '#0a1520' : 'transparent'
+                    }}
+                  >
+                    <span style={{
+                      width: 6, height: 6, borderRadius: '50%', flexShrink: 0,
+                      background: prereqCompleted ? '#60a5fa' : (clickable ? border : '#333'),
+                    }} />
+                    <span style={{
+                      fontSize: 13,
+                      color: prereqCompleted ? '#60a5fa' : (clickable ? '#aaa' : '#444'),
+                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                      minWidth: 0, flex: 1,
+                    }}>
+                      {name}
+                    </span>
+                    {clickable && (
+                      <svg style={{ marginLeft: 'auto', flexShrink: 0 }} width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={prereqCompleted ? '#2a5a8c' : '#444'} strokeWidth="2.5" strokeLinecap="round">
+                        <polyline points="9 18 15 12 9 6"/>
+                      </svg>
+                    )}
+                  </li>
+                ))}
               </ul>
             )}
           </Section>
@@ -183,7 +243,6 @@ export default function CourseDetailPanel({ course, courses, onClose, onSelectCo
               </Section>
             </>
           )}
-
         </div>
       </div>
 

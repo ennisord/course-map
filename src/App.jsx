@@ -7,6 +7,7 @@ import LoadingScreen from './components/LoadingScreen'
 import CourseDetailPanel from './components/CourseDetailPanel'
 import ElectivePopup from './components/ElectivePopup'
 import SearchPopup from './components/SearchPopup'
+import CompletedPopup from './components/CompletedPopup'
 
 const WORD = 'Course Map'
 
@@ -21,6 +22,16 @@ const ZONE_LABELS = {
 }
 
 const LABEL_OFFSET_Y = -80
+const LS_COMPLETED_KEY = 'coursemap:completed'
+const LS_WISHLISTED_KEY = 'coursemap:wishlisted'
+
+function loadSet(key) {
+  try { return new Set(JSON.parse(localStorage.getItem(key)) ?? []) }
+  catch { return new Set() }
+}
+function saveSet(key, set) {
+  localStorage.setItem(key, JSON.stringify([...set]))
+}
 
 export default function App() {
   const [offset, setOffset] = useState({ x: 100, y: 200 })
@@ -29,10 +40,14 @@ export default function App() {
   const [selectedId, setSelectedId] = useState(null)
   const [loading, setLoading] = useState(true)
   const [popup, setPopup] = useState(null)
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [completedOpen, setCompletedOpen] = useState(false)
+  const [completedIds, setCompletedIds] = useState(() => loadSet(LS_COMPLETED_KEY))
+  const [wishlistedIds, setWishlistedIds] = useState(() => loadSet(LS_WISHLISTED_KEY))
+
   const startRef = useRef({ x: 0, y: 0 })
   const lastPinchRef = useRef(null)
   const didDragRef = useRef(false)
-  const [searchOpen, setSearchOpen] = useState(false)
 
   const { layout, collapsedElectives, zoneExtents } = buildLayout(courses)
 
@@ -49,6 +64,33 @@ export default function App() {
   const selectedCourse = selectedId
     ? courses.find(c => getCourseKey(c) === selectedId) ?? null
     : null
+
+  const toggleCompleted = (key) => {
+    setCompletedIds(prev => {
+      const next = new Set(prev)
+      next.has(key) ? next.delete(key) : next.add(key)
+      saveSet(LS_COMPLETED_KEY, next)
+      return next
+    })
+  }
+
+  const removeCompleted = (key) => {
+    setCompletedIds(prev => {
+      const next = new Set(prev)
+      next.delete(key)
+      saveSet(LS_COMPLETED_KEY, next)
+      return next
+    })
+  }
+
+  const toggleWishlisted = (key) => {
+    setWishlistedIds(prev => {
+      const next = new Set(prev)
+      next.has(key) ? next.delete(key) : next.add(key)
+      saveSet(LS_WISHLISTED_KEY, next)
+      return next
+    })
+  }
 
   useEffect(() => {
     const t = setTimeout(() => setLoading(false), WORD.length * 120 + 600)
@@ -190,10 +232,7 @@ export default function App() {
         top: 0,
         left: 0,
       }}>
-        <svg
-          className="absolute top-0 left-0 overflow-visible pointer-events-none"
-          style={{ width: 4000, height: 4000 }}
-        >
+        <svg className="absolute top-0 left-0 overflow-visible pointer-events-none" style={{ width: 4000, height: 4000 }}>
           {Object.entries(zoneExtents).map(([zone, { startX, endX }]) => {
             const label = ZONE_LABELS[Number(zone)]
             if (!label) return null
@@ -221,14 +260,13 @@ export default function App() {
           {courses.map(course => {
             const key = getCourseKey(course)
             const from = layout[key]
-            if (!from) return null
-            if (selectedId !== key) return null
+            if (!from || selectedId !== key) return null
+            const { border } = getColor(course.tags)
             return course.prereqs.map((prereq, i) => {
               const prereqKey = resolvePrereq(prereq, courses)
               if (!prereqKey) return null
               const to = layout[prereqKey]
               if (!to) return null
-              const { border } = getColor(course.tags)
               return (
                 <path
                   key={`${key}-${i}`}
@@ -262,6 +300,10 @@ export default function App() {
                 }}
                 courses={courses}
                 onSelectCourse={(prereqKey) => setSelectedId(prereqKey)}
+                completedIds={completedIds}
+                wishlistedIds={wishlistedIds}
+                onToggleCompleted={toggleCompleted}
+                onToggleWishlisted={toggleWishlisted}
               />
             )
           })}
@@ -326,18 +368,30 @@ export default function App() {
         />
       )}
 
+      {completedOpen && (
+        <CompletedPopup
+          courses={courses}
+          completedIds={completedIds}
+          onRemove={removeCompleted}
+          onSelectCourse={(key) => setSelectedId(key)}
+          onClose={() => setCompletedOpen(false)}
+        />
+      )}
+
       <CourseDetailPanel
         course={selectedCourse}
         courses={courses}
         onClose={() => setSelectedId(null)}
         onSelectCourse={(key) => setSelectedId(key)}
-
+        completedIds={completedIds}
+        onToggleCompleted={toggleCompleted}
       />
 
       <Legend
         onZoomIn={() => applyZoom(0.15, window.innerWidth / 2, window.innerHeight / 2)}
         onZoomOut={() => applyZoom(-0.15, window.innerWidth / 2, window.innerHeight / 2)}
         onOpenSearch={() => setSearchOpen(true)}
+        onOpenCompleted={() => setCompletedOpen(true)}
       />
     </div>
   )
