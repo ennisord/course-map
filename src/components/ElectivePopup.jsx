@@ -1,24 +1,23 @@
-import { useEffect, useRef } from 'react'
-import { getColor, resolvePrereq } from '../utils/courseUtils'
+import { useRef } from 'react'
+import { getColor, getCourseKey, resolvePrereq } from '../utils/courseUtils'
 
 const isMobile = () => window.innerWidth < 768
 
-export default function ElectivePopup({ courses, onSelectCourse, onClose, selectedId, allCourses }) {
+export default function ElectivePopup({ courses, onSelectCourse, onClose, selectedId, allCourses, completedIds }) {
   const ref = useRef(null)
-  const mountedRef = useRef(false)
 
   if (!courses.length) return null
 
+  const allC = allCourses || courses
+
   return (
     <>
-      {/* Backdrop — closes popup on outside click without fighting document event order */}
       <div
         style={{ position: 'fixed', inset: 0, zIndex: 999 }}
         onMouseDown={e => { e.stopPropagation(); onClose() }}
         onTouchStart={e => { e.stopPropagation(); onClose() }}
       />
 
-      {/* Popup */}
       <div
         ref={ref}
         onMouseDown={e => e.stopPropagation()}
@@ -26,8 +25,7 @@ export default function ElectivePopup({ courses, onSelectCourse, onClose, select
         onWheel={e => e.stopPropagation()}
         style={{
           position: 'fixed',
-          top: '50%',
-          left: '50%',
+          top: '50%', left: '50%',
           transform: 'translate(-50%, -50%)',
           width: 'min(520px, calc(100vw - 48px))',
           height: 'min(680px, calc(100vh - 80px))',
@@ -46,9 +44,7 @@ export default function ElectivePopup({ courses, onSelectCourse, onClose, select
         <div style={{
           padding: '12px 14px 10px',
           borderBottom: '1px solid #222',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           flexShrink: 0,
         }}>
           <div>
@@ -61,17 +57,7 @@ export default function ElectivePopup({ courses, onSelectCourse, onClose, select
           </div>
           <button
             onClick={onClose}
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              color: '#555',
-              padding: 4,
-              borderRadius: 6,
-              display: 'flex',
-              alignItems: 'center',
-              transition: 'color 0.15s',
-            }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#555', padding: 4, borderRadius: 6, display: 'flex', alignItems: 'center', transition: 'color 0.15s' }}
             onMouseEnter={e => e.currentTarget.style.color = '#aaa'}
             onMouseLeave={e => e.currentTarget.style.color = '#555'}
           >
@@ -81,7 +67,6 @@ export default function ElectivePopup({ courses, onSelectCourse, onClose, select
           </button>
         </div>
 
-        {/* Custom scrollbar styles */}
         <style>{`
           .elective-list::-webkit-scrollbar { width: 5px; }
           .elective-list::-webkit-scrollbar-track { background: transparent; }
@@ -89,33 +74,53 @@ export default function ElectivePopup({ courses, onSelectCourse, onClose, select
           .elective-list::-webkit-scrollbar-thumb:hover { background: #444; }
         `}</style>
 
-        {/* Course list */}
-        <div className="elective-list" style={{ overflowY: 'auto', padding: '8px 8px', display: 'flex', flexDirection: 'column', gap: 5, scrollbarGutter: 'stable' }}>
+        <div className="elective-list" style={{ overflowY: 'auto', padding: '8px', display: 'flex', flexDirection: 'column', gap: 5, scrollbarGutter: 'stable' }}>
           {courses.map(course => {
-            const key = `${course.dept}-${course.id}`
+            const key = getCourseKey(course)
             const isSelected = selectedId === key
             const { border, text, muted } = getColor(course.tags)
 
-            const blobs = (course.prereqs || []).map(prereq => {
-              const prereqKey = resolvePrereq(prereq, allCourses || courses)
-              const prereqCourse = prereqKey ? (allCourses || courses).find(c => `${c.dept}-${c.id}` === prereqKey) : null
-              let label
-              if (prereqCourse) {
-                label = prereqCourse.dept === 'ECON' ? String(prereqCourse.id) : `${prereqCourse.dept} ${prereqCourse.id}`
+            // Build blobs with completed awareness, deduped by resolved key
+            const blobMap = new Map()
+            ;(course.prereqs || []).forEach(prereq => {
+              const prereqKey = resolvePrereq(prereq, allC)
+              const prereqCourse = prereqKey ? allC.find(c => getCourseKey(c) === prereqKey) : null
+              const rawLabel = typeof prereq === 'number'
+                ? String(prereq)
+                : prereq.trim().split(/\s+/).slice(1).join(' ') || prereq
+
+              if (prereqKey) {
+                if (!blobMap.has(prereqKey)) blobMap.set(prereqKey, { prereqCourse, labels: [] })
+                blobMap.get(prereqKey).labels.push(rawLabel)
               } else {
-                label = typeof prereq === 'number' ? String(prereq) : prereq
+                const fk = `unresolved-${prereq}`
+                if (!blobMap.has(fk)) blobMap.set(fk, { prereqCourse: null, labels: [rawLabel] })
               }
-              return { prereqKey, label }
             })
+
+            const blobs = Array.from(blobMap.entries()).map(([prereqKey, { prereqCourse, labels }]) => {
+              const prereqCompleted = !prereqKey.startsWith('unresolved-') && (completedIds?.has(prereqKey) ?? false)
+              let displayLabel
+              if (prereqCourse) {
+                const firstId = Array.isArray(prereqCourse.id) ? prereqCourse.id[0] : prereqCourse.id
+                const base = prereqCourse.dept === 'ECON' ? String(firstId) : `${prereqCourse.dept} ${firstId}`
+                displayLabel = labels.length > 1
+                  ? `${base} / ${labels.slice(1).map(l => l.replace(/^[A-Z]+ /, '')).join(' / ')}`
+                  : base
+              } else {
+                displayLabel = labels[0]
+              }
+              return { prereqKey, displayLabel, prereqCompleted }
+            })
+
+            const hasPrereqs = blobs.length > 0
+            const allDone = hasPrereqs && blobs.every(b => b.prereqCompleted)
 
             return (
               <button
                 key={key}
                 onMouseDown={e => e.stopPropagation()}
-                onClick={() => {
-                  onSelectCourse(course)
-                  if (isMobile()) onClose()
-                }}
+                onClick={() => { onSelectCourse(course); if (isMobile()) onClose() }}
                 style={{
                   background: isSelected ? '#1e1e1e' : '#1a1a1a',
                   border: `1px solid ${isSelected ? text : border}`,
@@ -127,44 +132,44 @@ export default function ElectivePopup({ courses, onSelectCourse, onClose, select
                   transition: 'background 0.15s, border-color 0.15s',
                   width: '100%',
                 }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.background = '#222'
-                  e.currentTarget.style.borderColor = text
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.background = isSelected ? '#1e1e1e' : '#1a1a1a'
-                  e.currentTarget.style.borderColor = isSelected ? text : border
-                }}
+                onMouseEnter={e => { e.currentTarget.style.background = '#222'; e.currentTarget.style.borderColor = text }}
+                onMouseLeave={e => { e.currentTarget.style.background = isSelected ? '#1e1e1e' : '#1a1a1a'; e.currentTarget.style.borderColor = isSelected ? text : border }}
               >
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 2 }}>
                   <span style={{ color: text, fontSize: 12, fontWeight: 700, letterSpacing: '0.04em' }}>
-                    {course.dept} {course.id}
+                    {course.dept} {Array.isArray(course.id) ? course.id[0] : course.id}
                   </span>
                 </div>
-                <div style={{ color: muted, fontSize: 11, lineHeight: 1.4, whiteSpace: 'normal', marginBottom: blobs.length ? 7 : 0 }}>
+                <div style={{ color: muted, fontSize: 11, lineHeight: 1.4, marginBottom: blobs.length ? 7 : 0 }}>
                   {course.name}
                 </div>
 
                 {blobs.length > 0 && (
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                    {blobs.map(({ prereqKey, label }) => (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 4 }}>
+                    {blobs.map(({ prereqKey, displayLabel, prereqCompleted }) => (
                       <span
-                        key={prereqKey ?? label}
+                        key={prereqKey}
                         style={{
-                          background: '#181818',
-                          border: '1px solid #5a5a5a',
+                          background: prereqCompleted ? '#0f2033' : '#181818',
+                          border: `1px solid ${prereqCompleted ? '#1a3a5c' : '#5a5a5a'}`,
                           borderRadius: 999,
                           padding: '1px 7px',
                           fontSize: 10,
                           fontWeight: 600,
-                          color: '#848484',
+                          color: prereqCompleted ? '#60a5fa' : '#848484',
                           letterSpacing: '0.03em',
                           lineHeight: 1.6,
+                          transition: 'background 0.15s, border-color 0.15s, color 0.15s',
                         }}
                       >
-                        {label}
+                        {displayLabel}
                       </span>
                     ))}
+                    {allDone && (
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: 2, flexShrink: 0 }}>
+                        <polyline points="20 6 9 17 4 12"/>
+                      </svg>
+                    )}
                   </div>
                 )}
               </button>

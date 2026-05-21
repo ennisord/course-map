@@ -355,6 +355,7 @@ export default function App() {
           courses={popupElectives.courses}
           allCourses={courses}
           selectedId={selectedId}
+          completedIds={completedIds}
           onSelectCourse={(course) => setSelectedId(getCourseKey(course))}
           onClose={() => setPopup(null)}
         />
@@ -363,6 +364,7 @@ export default function App() {
       {searchOpen && (
         <SearchPopup
           courses={courses}
+          completedIds={completedIds}
           onSelectCourse={(course) => { setSelectedId(getCourseKey(course)); setSearchOpen(false) }}
           onClose={() => setSearchOpen(false)}
         />
