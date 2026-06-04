@@ -8,6 +8,7 @@ import CourseDetailPanel from './components/CourseDetailPanel'
 import ElectivePopup from './components/ElectivePopup'
 import SearchPopup from './components/SearchPopup'
 import CompletedPopup from './components/CompletedPopup'
+import IntroPopup from './components/IntroPopup'
 
 const WORD = 'Course Map'
 
@@ -24,6 +25,7 @@ const ZONE_LABELS = {
 const LABEL_OFFSET_Y = -80
 const LS_COMPLETED_KEY = 'coursemap:completed'
 const LS_WISHLISTED_KEY = 'coursemap:wishlisted'
+const LS_INTRO_DISMISSED = 'coursemap:intro_dismissed'
 
 function loadSet(key) {
   try { return new Set(JSON.parse(localStorage.getItem(key)) ?? []) }
@@ -44,6 +46,7 @@ export default function App() {
   const [completedOpen, setCompletedOpen] = useState(false)
   const [completedIds, setCompletedIds] = useState(() => loadSet(LS_COMPLETED_KEY))
   const [wishlistedIds, setWishlistedIds] = useState(() => loadSet(LS_WISHLISTED_KEY))
+  const [introOpen, setIntroOpen] = useState(() => !localStorage.getItem(LS_INTRO_DISMISSED))
 
   const startRef = useRef({ x: 0, y: 0 })
   const lastPinchRef = useRef(null)
@@ -90,6 +93,13 @@ export default function App() {
       saveSet(LS_WISHLISTED_KEY, next)
       return next
     })
+  }
+
+  const closeIntro = (dontShowAgain = false) => {
+    setIntroOpen(false)
+    if (dontShowAgain) {
+      localStorage.setItem(LS_INTRO_DISMISSED, 'true')
+    }
   }
 
   useEffect(() => {
@@ -349,6 +359,12 @@ export default function App() {
           )
         })}
       </div>
+
+      {introOpen && (
+        <IntroPopup
+          onClose={closeIntro}
+        />
+      )}
 
       {popup && popupElectives && (
         <ElectivePopup
