@@ -13,7 +13,7 @@ const features = [
         <line x1="12" y1="2" x2="12" y2="22"/>
       </svg>
     ),
-    text: 'Drag to pan, scroll to zoom. Explore elective clusters by clicking the category buttons.',
+    text: 'Drag to pan, scroll to zoom. Explore elective clusters by clicking on the elective lists.',
   },
   {
     icon: (
@@ -32,7 +32,7 @@ const features = [
         <path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
       </svg>
     ),
-    text: "Mark courses as completed to see which ones you're eligible to take.",
+    text: "Mark courses as completed to see which ones you're eligible to take next, and whether you're on track to complete your program.",
   },
 ]
 
