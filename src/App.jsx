@@ -13,8 +13,7 @@ import IntroPopup from './components/IntroPopup'
 const WORD = 'Course Map'
 
 const ZONE_LABELS = {
-  1: { title: '100-level', sub: 'Foundations' },
-  2: { title: '200-level', sub: 'Core methods' },
+  2: { title: '200-level', sub: 'Foundations' },
   3: { title: '300-level', sub: 'Intermediate theory' },
   4: { title: '400-level', sub: 'Upper-intermediate topics' },
   5: { title: '500-level', sub: 'Advanced topics' },
