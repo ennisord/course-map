@@ -12,6 +12,7 @@ export default function IntroPopup({ onClose }) {
           backdropFilter: 'blur(8px)',
           WebkitBackdropFilter: 'blur(8px)', // Safari
           background: 'rgba(0,0,0,0.4)',
+          cursor: 'default'
         }}
         onMouseDown={() => onClose()}
         onTouchStart={() => onClose()}
@@ -23,6 +24,7 @@ export default function IntroPopup({ onClose }) {
         onTouchStart={e => e.stopPropagation()}
         style={{
           position: 'fixed',
+          cursor: 'default',
           top: '50%', left: '50%',
           transform: 'translate(-50%, -50%)',
           width: 'min(480px, calc(100vw - 32px))',
@@ -42,26 +44,11 @@ export default function IntroPopup({ onClose }) {
           alignItems: 'center',
           justifyContent: 'space-between',
         }}>
-          <span style={{ color: '#e0e0e0', fontSize: 18, fontWeight: 700, letterSpacing: '0.02em' }}>
-            Course Map
+          <span style={{ margin: 'auto', color: '#e0e0e0', fontSize: 18, fontWeight: 700, letterSpacing: '0.02em' }}>
+            UCalgary Economics Course Map
           </span>
-          <button
-            onClick={onClose}
-            style={{
-              background: 'none', border: 'none', cursor: 'pointer',
-              color: '#2e2e2e', padding: 6, borderRadius: 6,
-              display: 'flex', alignItems: 'center', transition: 'color 0.15s',
-            }}
-            onMouseEnter={e => e.currentTarget.style.color = '#777'}
-            onMouseLeave={e => e.currentTarget.style.color = '#2e2e2e'}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-            </svg>
-          </button>
+          
         </div>
-
-        <div style={{ height: 1, background: '#141414' }} />
 
         {/* Body */}
         <div style={{ padding: '20px 22px' }}>
@@ -72,8 +59,6 @@ export default function IntroPopup({ onClose }) {
             Drag to pan · Scroll to zoom · Click a node to inspect
           </p>
         </div>
-
-        <div style={{ height: 1, background: '#141414' }} />
 
         {/* Footer */}
         <div style={{ padding: '16px 22px 20px', display: 'flex', flexDirection: 'column', gap: 10 }}>
