@@ -71,10 +71,10 @@ export default function IntroPopup({ onClose }) {
             style={{ opacity: 0.4, width: 36, height: 36, objectFit: 'contain' }}
           />
           <div className="flex flex-col items-center gap-[2px]">
-            <span className="text-[#484848] text-sm font-medium tracking-widest uppercase">
+            <span className="text-[#484848] text-xs sm:text-sm font-medium tracking-widest uppercase">
               Welcome to the
             </span>
-            <span className="text-[#e0e0e0] text-xl font-bold tracking-wide">
+            <span className="text-[#e0e0e0] text-md sm:text-xl font-bold tracking-wide">
               UCalgary Economics Course Map
             </span>
           </div>
@@ -88,7 +88,7 @@ export default function IntroPopup({ onClose }) {
           {features.map(({ icon, text }, i) => (
             <div key={i} className="flex items-center gap-3">
               <div className="w-[30px] shrink-0 flex items-center justify-center opacity-70">{icon}</div>
-              <p className="m-0 text-[#727272] text-sm font-light leading-[1.65] tracking-[0.01em] text-left">
+              <p className="m-0 text-[#727272] text-xs sm:text-sm font-light leading-[1.65] tracking-[0.01em] text-left">
                 {text}
               </p>
             </div>
@@ -129,7 +129,7 @@ export default function IntroPopup({ onClose }) {
                 )}
               </div>
             </div>
-            <span className="text-[#646464] group-hover:text-[#727272] text-sm font-medium tracking-[0.02em] select-none transition-colors duration-100">
+            <span className="text-[#646464] group-hover:text-[#727272] text-xs sm:text-sm font-medium tracking-[0.02em] select-none transition-colors duration-100">
               Don't show this again
             </span>
           </label>
