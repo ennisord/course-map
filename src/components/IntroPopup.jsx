@@ -3,20 +3,24 @@ import { useState } from 'react'
 const features = [
   {
     icon: (
-      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#727272" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M18 11V8a2 2 0 0 0-4 0v3"/>
-        <path d="M14 11V6a2 2 0 0 0-4 0v5"/>
-        <path d="M10 11V8a2 2 0 0 0-4 0v6c0 3.31 2.69 6 6 6h0a6 6 0 0 0 6-6v-3a2 2 0 0 0-4 0"/>
+      <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="#727272" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        {/* Four-arrow move cursor */}
+        <polyline points="5 9 2 12 5 15"/>
+        <polyline points="9 5 12 2 15 5"/>
+        <polyline points="15 19 12 22 9 19"/>
+        <polyline points="19 9 22 12 19 15"/>
+        <line x1="2" y1="12" x2="22" y2="12"/>
+        <line x1="12" y1="2" x2="12" y2="22"/>
       </svg>
     ),
-    text: 'Drag to pan, scroll to zoom. Explore elective clusters by clicking the category buttons',
+    text: 'Drag to pan, scroll to zoom. Explore elective clusters by clicking the category buttons.',
   },
   {
     icon: (
-      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#727272" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M9 11V4a2 2 0 1 1 4 0v7"/>
-        <path d="M13 9a2 2 0 1 1 4 0v3"/>
-        <path d="M17 10a2 2 0 1 1 4 0v4a6 6 0 0 1-6 6h-2a6 6 0 0 1-6-6v-1l-1-4a2 2 0 1 1 3.9-.9L9 11"/>
+      <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="#727272" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        {/* Eye */}
+        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+        <circle cx="12" cy="12" r="3"/>
       </svg>
     ),
     text: 'Click any course to view its description, prerequisites, and what it unlocks.',
@@ -28,7 +32,7 @@ const features = [
         <path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
       </svg>
     ),
-    text: "Mark courses as completed to see which ones you're now eligible to take.",
+    text: "Mark courses as completed to see which ones you're eligible to take.",
   },
 ]
 
@@ -60,18 +64,31 @@ export default function IntroPopup({ onClose }) {
         onTouchStart={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-center px-[22px] py-[22px]">
-          <span className="text-[#e0e0e0] text-xl font-bold tracking-wide">
-            UCalgary Economics Course Map
-          </span>
+        <div className="flex flex-col items-center justify-center px-[22px] pt-[26px] pb-[22px] gap-[10px]">
+          <img
+            src="/uofc-crest.png"
+            alt="University of Calgary crest"
+            style={{ opacity: 0.4, width: 36, height: 36, objectFit: 'contain' }}
+          />
+          <div className="flex flex-col items-center gap-[2px]">
+            <span className="text-[#484848] text-sm font-medium tracking-widest uppercase">
+              Welcome to the
+            </span>
+            <span className="text-[#e0e0e0] text-xl font-bold tracking-wide">
+              UCalgary Economics Course Map
+            </span>
+          </div>
         </div>
+
+        {/* Divider */}
+        <div style={{ height: 1, background: '#141414' }} />
 
         {/* Body */}
         <div className="px-[22px] py-5 flex flex-col gap-4">
           {features.map(({ icon, text }, i) => (
-            <div key={i} className="flex items-start gap-3">
-              <div className="mt-[2px] shrink-0 opacity-70">{icon}</div>
-              <p className="m-2 text-[#727272] text-sm font-light leading-[1.65] tracking-[0.01em] text-left">
+            <div key={i} className="flex items-center gap-3">
+              <div className="w-[30px] shrink-0 flex items-center justify-center opacity-70">{icon}</div>
+              <p className="m-0 text-[#727272] text-sm font-light leading-[1.65] tracking-[0.01em] text-left">
                 {text}
               </p>
             </div>
@@ -84,8 +101,19 @@ export default function IntroPopup({ onClose }) {
         {/* Footer */}
         <div className="flex flex-col gap-[10px] px-[22px] pt-4 pb-5">
 
+          {/* Beta notice */}
+          <p className="m-0 text-[#484848] text-xs leading-[1.6] tracking-[0.01em]">
+            This tool is still in beta. Data may be incomplete, and funcionality may not be perfect. Found something off?{' '}
+            <a
+              href="mailto:ennis.leeming@ucalgary.ca"
+              className="text-[#484848] hover:text-[#666] underline underline-offset-2 transition-colors duration-100"
+            >
+              ennis.leeming@ucalgary.ca
+            </a>
+          </p>
+
           {/* Custom checkbox */}
-          <label className="flex items-center gap-[10px] cursor-pointer group">
+          <label className="mt-3 mb-2 flex items-center gap-[10px] cursor-pointer group">
             <div className="relative w-[15px] h-[15px] shrink-0">
               <input
                 type="checkbox"
